@@ -12,31 +12,30 @@ if (isset($_GET['runde'])) {
     }
 }
 
-// 2. Location bestimmen (MUSS beim Aufruf in der URL stehen: ?location=1 oder ?location=2)
+// 2. Location des aktuellen Screens bestimmen
 $location = isset($_GET['location']) ? intval($_GET['location']) : 1;
 
 /**
- * KAMERA-KONFIGURATION
- * Saal 1 (Atrium) ist IMMER an pi5-1
- * Saal 2 (HJV Saal) ist IMMER an pi5-2
+ * ATRIUM (Kamera 1) ist physisch an pi5-1
+ * HJV SAAL (Kamera 2) ist physisch an pi5-2
  */
 
-// Konfiguration für ATRIUM (Kamera 1)
+// Pfade für ATRIUM
 if ($location == 1) {
-    $cam1_check  = "check_cam.php"; // Lokal
-    $cam1_stream = "http://localhost:8080/stream";
+    $atrium_check  = "check_cam.php"; // Lokal auf Pi 1
+    $atrium_stream = "http://localhost:8080/stream";
 } else {
-    $cam1_check  = "http://pi5-1.local/bl/check_cam.php"; // Remote
-    $cam1_stream = "http://pi5-1.local:8080/stream";
+    $atrium_check  = "http://pi5-1.local/bl/check_cam.php"; // Remote von Pi 2 aus
+    $atrium_stream = "http://pi5-1.local:8080/stream";
 }
 
-// Konfiguration für HJV SAAL (Kamera 2)
+// Pfade für HJV SAAL
 if ($location == 2) {
-    $cam2_check  = "check_cam.php"; // Lokal
-    $cam2_stream = "http://localhost:8080/stream";
+    $hjv_check  = "check_cam.php"; // Lokal auf Pi 2
+    $hjv_stream = "http://localhost:8080/stream";
 } else {
-    $cam2_check  = "http://pi5-2.local/bl/check_cam.php"; // Remote
-    $cam2_stream = "http://pi5-2.local:8080/stream";
+    $hjv_check  = "http://pi5-2.local/bl/check_cam.php"; // Remote von Pi 1 aus
+    $hjv_stream = "http://pi5-2.local:8080/stream";
 }
 ?>
 <!DOCTYPE html>
@@ -147,11 +146,12 @@ if ($location == 2) {
                 <div class="content-area" style="padding: 15px;">
                     <div class="cam-container">
                         <div class="cam-label">Atrium</div>
-                        <img src="<?php echo $cam1_stream; ?>" id="img-cam1" class="cam-placeholder">
+                        <img src="<?php echo $atrium_stream; ?>" id="img-cam1" class="cam-placeholder">
                     </div>
+
                     <div class="cam-container" style="margin-bottom: 0;">
                         <div class="cam-label">Hans-Jochen Vogel Saal</div>
-                        <img src="<?php echo $cam2_stream; ?>" id="img-cam2" class="cam-placeholder"> 
+                        <img src="<?php echo $hjv_stream; ?>" id="img-cam2" class="cam-placeholder"> 
                     </div>
                 </div>
             </div>
@@ -270,17 +270,17 @@ function updateDashboard() {
 }
 
 // --- KAMERA LOGIK (ISOLIERT) ---
-const configCam1 = {
+const cfgCam1 = {
     img: document.getElementById('img-cam1'),
-    check: '<?php echo $cam1_check; ?>',
-    stream: '<?php echo $cam1_stream; ?>',
+    check: '<?php echo $atrium_check; ?>',
+    stream: '<?php echo $atrium_stream; ?>',
     fallback: 'img/saal1.jpg'
 };
 
-const configCam2 = {
+const cfgCam2 = {
     img: document.getElementById('img-cam2'),
-    check: '<?php echo $cam2_check; ?>',
-    stream: '<?php echo $cam2_stream; ?>',
+    check: '<?php echo $hjv_check; ?>',
+    stream: '<?php echo $hjv_stream; ?>',
     fallback: 'img/saal2.jpg'
 };
 
