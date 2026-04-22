@@ -1,5 +1,24 @@
 <?php
-$runde = isset($_GET['runde']) ? intval($_GET['runde']) : 12;
+if (isset($_GET['runde'])) {
+    $runde = intval($_GET['runde']);
+} else {
+    $heute = date('d.m'); // Format: Tag.Monat (z.B. 24.04)
+    
+    switch ($heute) {
+        case '24.04':
+            $runde = 13;
+            break;
+        case '25.04':
+            $runde = 14;
+            break;
+        case '26.04':
+            $runde = 15;
+            break;
+        default:
+            $runde = 12;
+            break;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="de">
