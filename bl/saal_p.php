@@ -364,52 +364,52 @@ const configs = {
 };
 
 async function validateCameras() {
-    // Definition der Ziele
-    const isPi1 = window.location.hostname.includes('pi5-1') || <?php echo $location; ?> === 1;
-    
-    const targets = {
+    const statusLocal = document.getElementById('status-local');
+    const statusRemote = document.getElementById('status-remote');
+
+    const config = {
         local: {
             img: document.getElementById('img-local'),
-            // Lokal wird immer die eigene Hardware direkt am Pi gefragt
-            checkUrl: 'check_cam.php', 
+            checkUrl: 'check_cam.php',
+            streamUrl: '<?php echo $cam_local; ?>',
             fallback: '<?php echo $img_local; ?>',
-            streamUrl: '<?php echo $cam_local; ?>'
+            display: statusLocal
         },
         remote: {
             img: document.getElementById('img-remote'),
-            // Remote wird der Partner-Pi gefragt (via mDNS oder Tailscale)
-            checkUrl: 'http://<?php echo ($location == 1 ? "pi5-2" : "pi5-1"); ?>local/bl/check_cam.php',
+            // Wir probieren hier zur Sicherheit den Namen ohne .local, falls mDNS zickt
+            checkUrl: 'http://<?php echo ($location == 1 ? "pi5-2" : "pi5-1"); ?>/bl/check_cam.php',
+            streamUrl: '<?php echo $cam_remote_local; ?>',
             fallback: '<?php echo $img_remote; ?>',
-            streamUrl: '<?php echo $cam_remote_local; ?>'
+            display: statusRemote
         }
     };
 
-    for (let key in targets) {
-        const t = targets[key];
-        if (!t.img) continue;
+    for (let key in config) {
+        const c = config[key];
+        if (!c.img) continue;
 
         try {
-            // Wir setzen einen kurzen Timeout, damit das Dashboard nicht hakt
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 2500);
+            const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-            const response = await fetch(t.checkUrl, { signal: controller.signal });
+            const response = await fetch(c.checkUrl, { signal: controller.signal });
             const data = await response.json();
             clearTimeout(timeoutId);
 
             if (data.status === 'online') {
-                // Falls wir gerade ein Standbild zeigen, schalten wir zurück auf Stream
-                if (t.img.src.includes('.jpg')) {
-                    t.img.src = t.streamUrl + '?t=' + Date.now();
+                c.display.innerHTML = `${key.toUpperCase()}: <span style="color:#0f0">ONLINE</span>`;
+                if (c.img.src.includes('.jpg')) {
+                    c.img.src = c.streamUrl + '?t=' + Date.now();
                 }
             } else {
-                // Kamera meldet Hardware-Fehler am Quell-Gerät
-                t.img.src = t.fallback;
+                c.display.innerHTML = `${key.toUpperCase()}: <span style="color:#f00">CAM OFFLINE</span>`;
+                c.img.src = c.fallback;
             }
         } catch (e) {
-            // Netzwerk-Fehler (Partner-Pi ist aus oder WLAN blockiert)
-            console.log("Check failed for " + key + ": " + e.message);
-            t.img.src = t.fallback;
+            // Hier fangen wir Netzwerkfehler ab (z.B. DNS-Fehler oder Timeout)
+            c.display.innerHTML = `${key.toUpperCase()}: <span style="color:#ffa500">NET ERROR (${e.name})</span>`;
+            c.img.src = c.fallback;
         }
     }
 }
@@ -419,5 +419,10 @@ setInterval(validateCameras, 10000);
 validateCameras();
 
 </script>
+<div id="debug-status" style="position: fixed; bottom: 10px; right: 10px; background: rgba(0,0,0,0.8); color: #0f0; padding: 15px; border-radius: 10px; font-family: monospace; font-size: 1.2rem; z-index: 9999; border: 1px solid #444;">
+    <div style="font-weight: bold; color: var(--accent-gold); margin-bottom: 5px;">DEBUG MONITOR</div>
+    <div id="status-local">Lokal: Checking...</div>
+    <div id="status-remote">Remote: Checking...</div>
+</div>
 </body>
 </html>
