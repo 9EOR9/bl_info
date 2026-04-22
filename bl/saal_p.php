@@ -19,6 +19,25 @@ if (isset($_GET['runde'])) {
             break;
     }
 }
+// 2. Location bestimmen 
+// location=1 -> Atrium (pi5-1)
+// location=2 -> 5. OG (pi5-2)
+$location = isset($_GET['location']) ? intval($_GET['location']) : 1;
+if ($location === 1) {
+    $title_saal = "Atrium";
+    $cam_local   = "http://pi5-1:8080/stream";
+    $img_local   = "img/saal1.jpg"; // Ersatzbild Atrium
+    $cam_remote  = "http://pi5-2:8080/stream";
+    $img_remote  = "img/saal2.jpg"; // Ersatzbild Saal 2
+    $label_remote = "Hans-Jochen Vogel Saal";
+} else {
+    $title_saal = "Hans-Jochen Vogel Saal";
+    $cam_local   = "http://pi5-2:8080/stream";
+    $img_local   = "img/saal2.jpg"; // Ersatzbild Saal 2
+    $cam_remote  = "http://pi5-1:8080/stream";
+    $img_remote  = "img/saal1.jpg"; // Ersatzbild Atrium
+    $label_remote = "Atrium";
+}
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -195,10 +214,23 @@ if (isset($_GET['runde'])) {
                 <div class="content-area" id="table-target"></div>
             </div>
             <div class="glass-box">
-                <div class="section-header">Live 🎥</div>
+                <div class="section-header">Turniersäle</div>
                 <div class="content-area" style="padding: 15px;">
-                    <div class="cam-container"><div class="cam-label">Atrium</div><img src="img/saal1.jpg" class="cam-placeholder"></div>
-                    <div class="cam-container" style="margin-bottom: 0;"><div class="cam-label">H.-J. Vogel Saal</div><img src="img/saal2.jpg" class="cam-placeholder"></div>
+									<div class="cam-container">
+											<div class="cam-label"><?php echo $title_saal; ?> (Live)</div>
+											<img src="<?php echo $cam_local; ?>" 
+													 class="cam-placeholder" 
+													 style="background: #000;" 
+													 onerror="this.onerror=null; this.src='<?php echo $img_local; ?>';">
+									</div>
+
+									<div class="cam-container" style="margin-bottom: 0;">
+											<div class="cam-label"><?php echo $label_remote; ?> (Remote)</div>
+											<img src="<?php echo $cam_remote; ?>" 
+													 class="cam-placeholder" 
+													 style="background: #000;" 
+													 onerror="this.onerror=null; this.src='<?php echo $img_remote; ?>';"> 
+									</div>
                 </div>
             </div>
             <div class="glass-box" style="flex-grow: 1;">
@@ -321,6 +353,37 @@ function updateDashboard() {
 }
 updateDashboard();
 setInterval(updateDashboard, 60000);
+
+// Funktion zur Überprüfung der Kamera-Verfügbarkeit
+function checkCams() {
+    const cams = [
+        { id: 'local', url: '<?php echo $cam_local; ?>', fallback: '<?php echo $img_local; ?>' },
+        { id: 'remote', url: '<?php echo $cam_remote; ?>', fallback: '<?php echo $img_remote; ?>' }
+    ];
+
+    cams.forEach(cam => {
+        const imgElement = document.querySelector(`img[data-cam-type="${cam.id}"]`);
+        if (!imgElement) return;
+
+        // Kleiner "Ping" an das Stream-Terminal
+        fetch(cam.url, { method: 'HEAD', mode: 'no-cors' })
+            .then(() => {
+                // Wenn erreichbar und aktuell das Fallback-Bild zeigt -> zurück zum Stream
+                if (imgElement.src.includes('.jpg')) {
+                    imgElement.src = cam.url + '?t=' + new Date().getTime();
+                }
+            })
+            .catch(() => {
+                // Wenn nicht erreichbar -> Fallback setzen
+                imgElement.src = cam.fallback;
+            });
+    });
+}
+
+// Damit das JS die Bilder findet, fügen wir im HTML oben data-cam-type="local" bzw. "remote" hinzu
+// (Ändere die img-Tags oben entsprechend ab: <img data-cam-type="local" ...>)
+
+setInterval(checkCams, 60000); // Alle 60 Sekunden prüfen
 </script>
 </body>
 </html>
