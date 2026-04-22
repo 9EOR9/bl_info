@@ -1,12 +1,12 @@
 <?php
-// check_cam.php
+header("Access-Control-Allow-Origin: *");
 header('Content-Type: application/json');
 
-// Wir prüfen, ob die Kamera auf Steuerbefehle reagiert
-// Das ist ein guter Indikator, ob sie im Standby ist
-$output = shell_exec("v4l2-ctl -d /dev/video0 --get-ctrl=brightness 2>&1");
+// Wir versuchen, eine einzige Eigenschaft der Kamera abzufragen. 
+// Wenn die Kamera "No Signal" zeigt oder aus ist, antwortet der Treiber oft mit einem Fehlercode.
+exec("v4l2-ctl -d /dev/video0 --get-ctrl=brightness 2>&1", $output, $return_var);
 
-if (strpos($output, 'failed') !== false || $output === null) {
+if ($return_var !== 0) {
     echo json_encode(['status' => 'offline']);
 } else {
     echo json_encode(['status' => 'online']);
