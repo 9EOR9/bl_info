@@ -1,0 +1,30 @@
+<div class="glass-box" style="padding: 20px; text-align: center;">
+    <h3>PTZ Steuerung</h3>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 200px; margin: 0 auto;">
+        <div></div>
+        <button onclick="controlCam('up')">▲</button>
+        <div></div>
+        
+        <button onclick="controlCam('left')">◀</button>
+        <button onclick="controlCam('stop')">■</button>
+        <button onclick="controlCam('right')">▶</button>
+        
+        <div></div>
+        <button onclick="controlCam('down')">▼</button>
+        <div></div>
+    </div>
+    <div style="margin-top: 20px;">
+        <button onclick="controlCam('zoomIn')">Zoom +</button>
+        <button onclick="controlCam('zoomOut')">Zoom -</button>
+    </div>
+</div>
+
+<script>
+function controlCam(direction) {
+    // Wir rufen den lokalen Proxy auf
+    fetch(`cam_proxy.php?cmd=${direction}`)
+        .then(response => response.json())
+        .then(data => console.log("Kamera-Antwort:", data))
+        .catch(err => console.error("Proxy-Fehler:", err));
+}
+</script>

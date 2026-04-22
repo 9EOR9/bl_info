@@ -1,0 +1,312 @@
+<?php 
+// Zentrale Steuerung der Rundennummer
+$runde = 14; 
+?>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Schach Bundesliga Endrunde - Lageplan</title>
+    <style>
+        @font-face {
+            font-family: 'Roboto Condensed';
+            src: url('fonts/RobotoCondensed-VariableFont_wght.ttf') format('truetype-variations');
+            font-weight: 100 900;
+        }
+
+        :root {
+            --bg-overlay: rgba(10, 10, 10, 0.9);
+            --glass-bg: rgba(15, 15, 15, 0.85);
+            --glass-blur: 2px;
+            --accent-light: rgba(255, 255, 255, 0.25);
+            --line-thickness: 1px;
+            --accent-gold: #c5a059;
+            --text-black: #000000;
+            --border-radius: 40px;
+            --header-white: #ffffff;
+            --gold: #c5a059;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            background: linear-gradient(var(--bg-overlay), var(--bg-overlay)), url('img/wbh.jpg') center/cover no-repeat;
+            width: 2160px; 
+            height: 3840px;
+            overflow: hidden;
+            display: flex; 
+            flex-direction: column; 
+        }
+
+        .header-bar {
+            width: 100%; 
+            background: var(--header-white);
+            padding: 90px 0; 
+            text-align: center;
+            border-bottom: 20px solid var(--gold);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+            z-index: 100;
+        }
+
+        .header-bar h1 { 
+            color: #000000;
+            font-size: 150px; 
+            text-transform: uppercase; 
+            letter-spacing: 12px;
+            line-height: 1.1;
+        }
+
+        .header-bar h2 { 
+            color: #000000;
+            font-size: 100px; 
+            text-transform: uppercase;
+            margin-top: 20px;
+            font-weight: 300;
+        }
+
+        .content-wrapper {
+            display: flex;
+            flex: 1;
+            width: 100%;
+            padding: 50px;
+            gap: 50px;
+        }
+
+        .column-left {
+            width: 50%;
+            display: flex;
+            align-items: center; 
+            justify-content: center;
+        }
+
+        .lageplan-img {
+            width: 100%;
+            height: auto;
+            max-height: 95%; 
+            object-fit: contain;
+            filter: drop-shadow(0 30px 60px rgba(0,0,0,0.7));
+        }
+
+        .column-right {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            justify-content: center;
+        }
+
+        .glass-box {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            border: var(--line-thickness) solid var(--accent-light);
+            border-radius: var(--border-radius);
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .section-header {
+            background: linear-gradient(to bottom, rgba(235, 235, 235, 0.5) 0%, rgba(255, 255, 255, 0.78) 100%) !important;
+            color: var(--text-black) !important;
+            font-size: 4rem; 
+            font-weight: 700; 
+            padding: 25px;
+            text-align: center; 
+            text-transform: uppercase;
+        }
+
+        .content-area { 
+            padding: 40px 30px; 
+            color: white;
+        }
+
+        .content-area b.info-line {
+            color: var(--accent-gold);
+            font-weight: 700;
+            display: block;
+            margin-bottom: 25px;
+            font-size: 2.6rem;
+            text-align: center;
+        }
+
+        /* --- TABELLEN-LAYOUT FÜR PAARUNGEN --- */
+        .match-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .match-table tr {
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .match-table tr:last-child { border-bottom: none; }
+
+        .match-table td {
+            padding: 20px 10px;
+            vertical-align: middle;
+            font-size: 2.1rem;
+        }
+
+        .team-name {
+            font-weight: 700; /* Etwas fettere Schrift */
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .logo-col { width: 80px; text-align: center; }
+        .name-heim { text-align: left; }
+        .name-gast { text-align: right; }
+
+        .team-logo-small {
+            height: 65px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+        }
+
+        /* --- SCORE BOX (aus saal_p.php) --- */
+        .score-box-cell {
+            width: 180px;
+            text-align: center;
+        }
+
+        .score-box {
+            display: inline-block;
+            width: 150px; 
+            height: 60px; 
+            line-height: 60px;
+            text-align: center; 
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px; 
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            font-size: 2.4rem; 
+            font-weight: bold; 
+            color: var(--accent-gold);
+        }
+
+        /* --- SONSTIGES --- */
+        .portrait-rabiega {
+            width: 300px;
+            height: auto;
+            border-radius: 20px;
+            margin: 20px 0;
+            border: 2px solid var(--accent-gold);
+            display: block;
+        }
+
+        .kommentierung-content {
+            font-size: 2.4rem;
+            font-weight: 300;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header-bar">
+        <h1>Schachbundesliga<br>Zentrale Endrunde</h1>
+        <h2>Willy-Brandt-Haus &bull; Berlin</h2> 
+    </div>
+
+    <div class="content-wrapper">
+        <div class="column-left">
+            <img src="img/wbh_lageplan.png" class="lageplan-img" alt="Lageplan">
+        </div>
+
+        <div class="column-right">
+            
+            <div class="glass-box">
+                <div class="section-header">Hans-Jochen Vogel Saal</div>
+                <div class="content-area">
+                    <b class="info-line" id="info-vogel">Lade Daten...</b>
+                    <table class="match-table" id="list-vogel"></table>
+                </div>
+            </div>
+
+            <div class="glass-box">
+                <div class="section-header">Live-Kommentierung</div>
+                <div class="content-area kommentierung-content">
+                    <b>Live-Kommentierung mit GM Robert Rabiega</b>
+                    <center><img src="img/rabiega.jpg" class="portrait-rabiega" alt="GM Robert Rabiega"></center>
+                    Start jeweils 15 Minuten nach Rundenbeginn
+                </div>
+            </div>
+
+            <div class="glass-box">
+                <div class="section-header">Atrium</div>
+                <div class="content-area">
+                    <b class="info-line" id="info-atrium">Lade Daten...</b>
+                    <table class="match-table" id="list-atrium"></table>
+                </div>
+            </div>
+
+            <div class="glass-box">
+                <div class="section-header">Eingang</div>
+                <div class="content-area" style="text-align: center; font-size: 2.6rem;">
+                    <b style="color: var(--accent-gold);">Erdgeschoss</b><br>
+                    Info-Desk, Garderobe & Zugang
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const runde = <?php echo $runde; ?>;
+        const datumText = "25. April - 14:00 Uhr";
+
+        const teamLogos = {
+            "Bayern München": "bayern.png", "Düsseldorfer SK": "dsk.png", "SC H-W-Neuwied": "neuwied.png",
+            "SG Solingen": "solingen.png", "Sfr. Wolfhagen": "wolfhagen.png", "SV Deggendorf": "deggendorf.png",
+            "Hamburger SK": "hsk.png", "Baden-Baden": "osg.png", "SF Deizisau": "deizisau.png",
+            "SK Kirchweyhe": "kirchweihe.png", "FC St. Pauli": "pauli.png", "SC Viernheim": "viernheim.png",
+            "USV TU Dresden": "dresden.png", "MSA Zugzwang": "msaz.png", "SF Berlin": "sfberlin.png", "Werder Bremen": "werder.png"
+        };
+
+        function getLogoHtml(teamName) {
+            const filename = teamLogos[teamName];
+            return filename ? `<img src="logos/${filename}" class="team-logo-small">` : "";
+        }
+
+        function updateLageplan() {
+            fetch(`data_loader.php?runde=${runde}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data || !data.begegnungen) return;
+
+                    const vogelTable = document.getElementById('list-vogel');
+                    const atriumTable = document.getElementById('list-atrium');
+                    
+                    document.getElementById('info-vogel').innerText = `Runde ${runde} - ${datumText}`;
+                    document.getElementById('info-atrium').innerText = `Runde ${runde} - ${datumText}`;
+
+                    let htmlVogel = "";
+                    let htmlAtrium = "";
+
+                    data.begegnungen.forEach((m, index) => {
+                        const rowHtml = `
+                            <tr>
+                                <td class="logo-col">${getLogoHtml(m.team_heim)}</td>
+                                <td class="team-name name-heim">${m.team_heim}</td>
+                                <td class="score-box-cell"><div class="score-box">${m.score_heim} : ${m.score_gast}</div></td>
+                                <td class="team-name name-gast">${m.team_gast}</td>
+                                <td class="logo-col">${getLogoHtml(m.team_gast)}</td>
+                            </tr>`;
+                        
+                        if (index < 4) htmlVogel += rowHtml;
+                        else htmlAtrium += rowHtml;
+                    });
+
+                    vogelTable.innerHTML = htmlVogel;
+                    atriumTable.innerHTML = htmlAtrium;
+                })
+                .catch(err => console.error("Fehler beim Datenabruf:", err));
+        }
+
+        updateLageplan();
+        setInterval(updateLageplan, 60000);
+    </script>
+</body>
+</html>

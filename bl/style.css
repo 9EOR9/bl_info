@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap');
+
+:root {
+    --bg-page: #4a4a46; 
+    --header-bg: #e0e0e0;
+    --text-black: #000000;
+    --accent-gold: #c5a059;
+    --border-radius: 25px;
+}
+
+/* Grundgerüst fixieren */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    background-color: var(--bg-page);
+    font-family: 'Roboto Condensed', sans-serif;
+    overflow: hidden; /* Verhindert Scrollbalken */
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* HEADER: Rundungen oben, unten gerade */
+.main-header {
+    background-color: var(--header-bg);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 40px;
+    height: 120px; /* Feste Höhe für Vorhersehbarkeit */
+    border-bottom: 5px solid var(--accent-gold);
+    box-sizing: border-box;
+    flex-shrink: 0; /* Header darf nicht schrumpfen */
+}
+
+.logo-wrapper-left, .logo-wrapper-right { width: 15%; display: flex; }
+.logo-wrapper-right { justify-content: flex-end; }
+.header-logo-sfb, .header-logo-sbl { height: 80px; width: auto; }
+
+.header-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--text-black);
+    text-transform: uppercase;
+    text-align: center;
+    flex: 1;
+}
+
+/* ACTION BOX: Schließt nahtlos an */
+.action-box {
+    background-color: #313131; /* Dunkler Kontrast zum Header */
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    padding: 20px;
+    border: 1px solid #222;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.action-row {
+    display: grid;
+    /* Webcam schmaler (0.8), Ergebnisse breiter (1.2) */
+    grid-template-columns: 0.8fr 1.2fr; 
+    gap: 25px;
+    align-items: center; /* Zentriert Webcam vertikal zu den Kapseln */
+}
+
+/* WEBCAM: Optimiert für schmalere Spalte */
+.webcam-container {
+    position: relative;
+    border: 2px solid #111;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    /* Sorgt dafür, dass das Bild die schmalere Spalte sauber ausfüllt */
+    display: flex;
+}
+
+.webcam-img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    display: block;
+}
+
+.saal-label {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0,0,0,0.85);
+    color: #fff;
+    padding: 4px 12px;
+    font-size: 1.4rem; /* Etwas kleinere Schrift für schmalere Box */
+    font-weight: 700;
+    border: 1px solid #444;
+    border-radius: 4px;
+}
+
+/* RECHTE ERGEBNISSE: Mehr Platz für Text */
+.quick-results {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.capsule-row {
+    background-color: #111;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    border: 1px solid #333;
+}
+
+.capsule-team {
+    font-size: 1.8rem; /* Jetzt etwas größer, da mehr Platz */
+    font-weight: 700;
+    color: #eee;
+    width: 40%;
+}
+
+.capsule-score {
+    color: var(--accent-gold);
+    font-size: 2.2rem;
+    font-weight: 700;
+    background: #000;
+    padding: 2px 20px;
+    border-radius: 8px;
+    border: 1px solid #c5a05933; /* Dezenter goldener Rand */
+    min-width: 100px;
+    text-align: center;
+}
+
+.text-right { text-align: right; }

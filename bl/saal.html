@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SBL Infoscreen - Saal 1</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap');
+
+        :root {
+            --bg-page: #000000; 
+            --header-bg-gradient: linear-gradient(to bottom, #d1d1d1 0%, #ffffff 100%);
+            --text-black: #000000;
+            --accent-gold: #ffcc00;
+            --border-radius: 25px;
+            --col-nr-width: 60px;
+            --col-logo-space: 140px; 
+            --col-res-width: 180px;
+            --line-thickness: 2px;
+            --header-font-size: 2.8rem;
+        }
+
+        html, body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-page);
+            font-family: 'Roboto Condensed', sans-serif;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        body { display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; }
+
+        .section-header {
+            background: var(--header-bg-gradient);
+            color: var(--text-black);
+            font-size: var(--header-font-size);
+            font-weight: 700;
+            padding: 10px 20px;
+            text-transform: uppercase;
+            border-bottom: var(--line-thickness) solid var(--accent-gold);
+            text-align: center;
+        }
+
+        /* --- SEKTION 1: HEADER --- */
+        .header-section-wrapper {
+            border: var(--line-thickness) solid var(--accent-gold);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-bottom: 25px;
+            background: var(--header-bg-gradient);
+            padding: 20px 40px;
+        }
+        .header-content { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .header-logo { height: 90px; width: auto; }
+        .header-main-title { font-size: 4.5rem; font-weight: 700; text-transform: uppercase; margin: 0; color: var(--text-black); text-align: center; flex: 1; }
+        .header-black-line { width: 100%; height: 3px; background-color: #000; margin: 10px 0; }
+        .header-subtitle { font-size: 2rem; font-weight: 400; color: #000; text-align: center; margin: 0; }
+
+        /* --- SEKTION 2: ATRIUM (Optimiert für 1280x720 / 16:9) --- */
+        .atrium-section-wrapper {
+            border: var(--line-thickness) solid var(--accent-gold);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+        .atrium-content-row { 
+            display: grid; 
+            /* Webcam bekommt jetzt 800px (klassisches 16:9 Verhältnis zu 450px Höhe) */
+            grid-template-columns: 800px 1fr 60px; 
+            align-items: stretch; 
+            height: 450px; 
+        }
+        .webcam-container { 
+            background: #000; 
+            display: flex; 
+            position: relative; 
+            border-right: var(--line-thickness) solid var(--accent-gold); 
+            overflow: hidden; 
+        }
+        .webcam-container iframe {
+            width: 100%; height: 100%; border: none;
+            position: absolute; top: 0; left: 0;
+            /* KEIN Zoom mehr nötig, da Kamera nun natives 16:9 liefert */
+            transform: scale(1.0); 
+        }
+        .saal-label { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); color: #fff; padding: 3px 10px; font-size: 1.2rem; font-weight: 700; border-radius: 4px; z-index: 10; }
+        
+        .atrium-table { width: 100%; border-collapse: collapse; font-size: 2.6rem; background-color: #1a1a1a; height: 100%; font-weight: bold;}
+        .atrium-table td { padding: 8px 15px; border-bottom: 1px solid #252525; color: #eee; vertical-align: middle; }
+        .atrium-table tr:nth-child(even) { background-color: #222; }
+        .atrium-logo { width: 55px; height: 55px; object-fit: contain; }
+        .atrium-score { text-align: center; color: var(--accent-gold) !important; background: rgba(0,0,0,0.4); width: 150px; border-left: 1px solid #333; border-right: 1px solid #333; font-weight: bold; }
+
+        /* --- SEKTION 3: EINZELERGEBNISSE --- */
+        .main-matches-box {
+            background-color: #1a1a1a;
+            border: var(--line-thickness) solid var(--accent-gold);
+            border-radius: 15px; overflow: hidden; margin-bottom: 25px;
+        }
+        .match-grid-row { 
+            display: grid; 
+            grid-template-columns: var(--col-nr-width) var(--col-logo-space) 1.2fr var(--col-res-width) 1.2fr var(--col-logo-space) var(--col-nr-width); 
+            align-items: center; width: 100%; 
+        }
+        .match-header-row { background: linear-gradient(to bottom, #3a3a3a 0%, #1e1e1e 100%); height: 90px; border-bottom: var(--line-thickness) solid var(--accent-gold); }
+        .match-header-row.with-top-line { border-top: var(--line-thickness) solid var(--accent-gold); }
+        .match-team-logo { width: 65px; height: 65px; object-fit: contain; }
+        .match-team-name-header { font-size: 2.5rem; font-weight: 700; color: #fff; }
+        .match-score-badge { background: #000; color: var(--accent-gold); font-size: 3rem; font-weight: 700; height: 100%; display: flex; align-items: center; justify-content: center; border-left: 1px solid #333; border-right: 1px solid #333; }
+        
+        .board-row { border-bottom: 1px solid #252525; height: 50px; }
+        .board-row:nth-child(even) { background-color: #222; }
+        .col-nr { color: #888; text-align: center; font-size: 1.1rem; }
+        .col-flag-container { display: flex; justify-content: center; align-items: center; }
+        .col-name-l { color: #eee; font-size: 1.9rem; text-align: left; padding-left: 10px; white-space: nowrap; overflow: hidden; }
+        .col-name-r { color: #eee; font-size: 1.9rem; text-align: right; padding-right: 10px; white-space: nowrap; overflow: hidden; }
+        .col-res { background: rgba(0,0,0,0.5); height: 100%; display: flex; align-items: center; justify-content: center; color: var(--accent-gold); font-weight: 700; font-size: 1.9rem; border-left: 1px solid #333; border-right: 1px solid #333; }
+        .flag { width: 28px; border-radius: 2px; }
+
+        /* --- SEKTION 4: TABELLE --- */
+        .table-block-wrapper { border: var(--line-thickness) solid var(--accent-gold); border-radius: 15px; background-color: #1a1a1a; overflow: hidden; margin-bottom: 20px; }
+        .split-table-container { display: grid; grid-template-columns: 1fr 1fr; }
+        .split-table-container > div:first-child { border-right: var(--line-thickness) solid var(--accent-gold); }
+        .league-table { width: 100%; border-collapse: collapse; font-size: 2rem; }
+        .league-table th { font-size: 1.2rem; color: #888; font-weight: 400; text-transform: uppercase; padding: 8px 15px; border-bottom: 1px solid #444; }
+        .league-table td { padding: 6px 15px; border-bottom: 1px solid #252525; color: #eee; }
+        .col-rank { width: 40px; text-align: center !important; color: var(--accent-gold); font-weight: 700; }
+        .col-points { text-align: right; width: 60px; }
+        .relegation-line td { border-top: 3px solid #ffffff !important; }
+        .table-footer { background: var(--header-bg-gradient); color: var(--text-black); padding: 10px 40px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 700; border-top: var(--line-thickness) solid var(--accent-gold); }
+        .sponsor-logo { height: 55px; margin-left: 30px; }
+    </style>
+</head>
+<body>
+
+    <div class="header-section-wrapper">
+        <div class="header-content">
+            <img src="sfb.png" class="header-logo">
+            <h1 class="header-main-title">Schachbundesliga - Zentrale Endrunde</h1>
+            <img src="sbl.png" class="header-logo">
+        </div>
+        <div class="header-black-line"></div>
+        <p class="header-subtitle">24. - 26. April 2026 im Willy-Brandt-Haus Berlin</p>
+    </div>
+
+<?php require "atrium.html" ?>
+
+    <div class="main-matches-box">
+        <div class="section-header">Hans-Jochen Vogel Saal</div>
+        
+        <div class="match-grid-row match-header-row">
+            <div class="col-nr"></div><div style="display:flex; justify-content:center;"><img src="logos/deizisau.png" class="match-team-logo"></div><div class="match-team-name-header">SF Deizisau</div><div class="match-score-badge">2 : 6</div><div class="match-team-name-header" style="text-align: right;">FC Bayern München</div><div style="display:flex; justify-content:center;"><img src="logos/bayern.png" class="match-team-logo"></div><div></div>
+        </div>
+        <div class="match-grid-row board-row"><div class="col-nr">1</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div class="col-name-l">GM M. Blübaum</div><div class="col-res">½ : ½</div><div class="col-name-r">GM V. Fedoseev</div><div class="col-flag-container"><img src="flags/si.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">2</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div class="col-name-l">GM D. Kollars</div><div class="col-res">0 : 1</div><div class="col-name-r">GM K. Alekseenko</div><div class="col-flag-container"><img src="flags/at.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">3</div><div class="col-flag-container"><img src="flags/hu.svg" class="flag"></div><div class="col-name-l">GM B. Gledura</div><div class="col-res">½ : ½</div><div class="col-name-r">GM J. Santos Latasa</div><div class="col-flag-container"><img src="flags/es.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">4</div><div class="col-flag-container"><img src="flags/fr.svg" class="flag"></div><div class="col-name-l">GM G. Kamsky</div><div class="col-res">½ : ½</div><div class="col-name-r">GM P. Idani</div><div class="col-flag-container"><img src="flags/ir.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">5</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div class="col-name-l">GM R. Dautov</div><div class="col-res">0 : 1</div><div class="col-name-r">GM J. Subelj</div><div class="col-flag-container"><img src="flags/si.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">6</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div class="col-name-l">GM A. Graf</div><div class="col-res">0 : 1</div><div class="col-name-r">GM V. Dragnev</div><div class="col-flag-container"><img src="flags/at.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">7</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div class="col-name-l">IM R. Köllner</div><div class="col-res">0 : 1</div><div class="col-name-r">GM A. Alonso Rosell</div><div class="col-flag-container"><img src="flags/es.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">8</div><div class="col-flag-container"><img src="flags/pl.svg" class="flag"></div><div class="col-name-l">GM M. Krasenkow</div><div class="col-res">½ : ½</div><div class="col-name-r">IM O. Kurmann</div><div class="col-flag-container"><img src="flags/ch.svg" class="flag"></div><div></div></div>
+
+        <div class="match-grid-row match-header-row with-top-line">
+            <div class="col-nr"></div><div style="display:flex; justify-content:center;"><img src="logos/msaz.png" class="match-team-logo"></div><div class="match-team-name-header">MSA Zugzwang</div><div class="match-score-badge">4 : 4</div><div class="match-team-name-header" style="text-align: right;">SV Deggendorf</div><div style="display:flex; justify-content:center;"><img src="logos/deggendorf.png" class="match-team-logo"></div><div></div>
+        </div>
+        <div class="match-grid-row board-row"><div class="col-nr">1</div><div class="col-flag-container"><img src="flags/ua.svg" class="flag"></div><div class="col-name-l">GM P. Eljanov</div><div class="col-res">1 : 0</div><div class="col-name-r">GM A. Indjic</div><div class="col-flag-container"><img src="flags/rs.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">2</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div class="col-name-l">L. Costa</div><div class="col-res">½ : ½</div><div class="col-name-r">GM D. Ghosh</div><div class="col-flag-container"><img src="flags/in.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">3</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div class="col-name-l">GM V. Kunin</div><div class="col-res">½ : ½</div><div class="col-name-r">GM M. Petrov</div><div class="col-flag-container"><img src="flags/bg.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">4</div><div class="col-flag-container"><img src="flags/at.svg" class="flag"></div><div class="col-name-l">GM D. Shengelia</div><div class="col-res">½ : ½</div><div class="col-name-r">GM E. Krivoborodov</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">5</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div class="col-name-l">GM S. Bromberger</div><div class="col-res">0 : 1</div><div class="col-name-r">GM B. Bogosavljevic</div><div class="col-flag-container"><img src="flags/rs.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">6</div><div class="col-flag-container"><img src="flags/at.svg" class="flag"></div><div class="col-name-l">IM V. Baidetskyi</div><div class="col-res">½ : ½</div><div class="col-name-r">GM A. Delchev</div><div class="col-flag-container"><img src="flags/rs.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">7</div><div class="col-flag-container"><img src="flags/is.svg" class="flag"></div><div class="col-name-l">GM G. Kjartansson</div><div class="col-res">½ : ½</div><div class="col-name-r">GM D. Stojanovic</div><div class="col-flag-container"><img src="flags/ba.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">8</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div class="col-name-l">GM G. Hertneck</div><div class="col-res">½ : ½</div><div class="col-name-r">GM M. Miljkovic</div><div class="col-flag-container"><img src="flags/rs.svg" class="flag"></div><div></div></div>
+
+        <div class="match-grid-row match-header-row with-top-line">
+            <div class="col-nr"></div><div style="display:flex; justify-content:center;"><img src="logos/dresden.png" class="match-team-logo"></div><div class="match-team-name-header">USV TU Dresden</div><div class="match-score-badge">1½ : 6½</div><div class="match-team-name-header" style="text-align: right;">SG Solingen</div><div style="display:flex; justify-content:center;"><img src="logos/solingen.png" class="match-team-logo"></div><div></div>
+        </div>
+        <div class="match-grid-row board-row"><div class="col-nr">1</div><div class="col-flag-container"><img src="flags/pl.svg" class="flag"></div><div class="col-name-l">GM M. Bartel</div><div class="col-res">0 : 1</div><div class="col-name-r">GM M. Warmerdam</div><div class="col-flag-container"><img src="flags/nl.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">2</div><div class="col-flag-container"><img src="flags/ro.svg" class="flag"></div><div class="col-name-l">GM L. D. Nisipeanu</div><div class="col-res">½ : ½</div><div class="col-name-r">GM E. L'Ami</div><div class="col-flag-container"><img src="flags/nl.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">3</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div class="col-name-l">GM J. Maiwald</div><div class="col-res">½ : ½</div><div class="col-name-r">GM M. Ragger</div><div class="col-flag-container"><img src="flags/at.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">4</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div class="col-name-l">IM M. Neef</div><div class="col-res">0 : 1</div><div class="col-name-r">GM L. Van Wely</div><div class="col-flag-container"><img src="flags/nl.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">5</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div class="col-name-l">GM U. Bönsch</div><div class="col-res">0 : 1</div><div class="col-name-r">GM J. Smeets</div><div class="col-flag-container"><img src="flags/nl.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">6</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div class="col-name-l">FM H. Möhn</div><div class="col-res">½ : ½</div><div class="col-name-r">IM A. Krastev</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">7</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div class="col-name-l">FM R. Lutz</div><div class="col-res">0 : 1</div><div class="col-name-r">GM A. Naumann</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">8</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div class="col-name-l">D. Fruth</div><div class="col-res">0 : 1</div><div class="col-name-r">GM F. Handke</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div></div></div>
+
+        <div class="match-grid-row match-header-row with-top-line">
+            <div class="col-nr"></div><div style="display:flex; justify-content:center;"><img src="logos/sfberlin.png" class="match-team-logo"></div><div class="match-team-name-header">SF Berlin</div><div class="match-score-badge">5 : 3</div><div class="match-team-name-header" style="text-align: right;">Düsseldorfer SK</div><div style="display:flex; justify-content:center;"><img src="logos/dsk.png" class="match-team-logo"></div><div></div>
+        </div>
+        <div class="match-grid-row board-row"><div class="col-nr">1</div><div class="col-flag-container"><img src="flags/pl.svg" class="flag"></div><div class="col-name-l">GM W. Moranda</div><div class="col-res">½ : ½</div><div class="col-name-r">GM V. Bologan</div><div class="col-flag-container"><img src="flags/md.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">2</div><div class="col-flag-container"><img src="flags/pl.svg" class="flag"></div><div class="col-name-l">GM J. Tomczak</div><div class="col-res">½ : ½</div><div class="col-name-r">GM A. Pavlidis</div><div class="col-flag-container"><img src="flags/gr.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">3</div><div class="col-flag-container"><img src="flags/lv.svg" class="flag"></div><div class="col-name-l">GM A. Neiksans</div><div class="col-res">0 : 1</div><div class="col-name-r">GM C. Schoppen</div><div class="col-flag-container"><img src="flags/nl.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">4</div><div class="col-flag-container"><img src="flags/pl.svg" class="flag"></div><div class="col-name-l">GM J. Klimkowski</div><div class="col-res">1 : 0</div><div class="col-name-r">GM T. Burg</div><div class="col-flag-container"><img src="flags/nl.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">5</div><div class="col-flag-container"><img src="flags/pl.svg" class="flag"></div><div class="col-name-l">IM J. Baum</div><div class="col-res">1 : 0</div><div class="col-name-r">GM A. Pijpers</div><div class="col-flag-container"><img src="flags/nl.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">6</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div class="col-name-l">IM R. Lagunow</div><div class="col-res">1 : 0</div><div class="col-name-r">GM R. Haria</div><div class="col-flag-container"><img src="flags/gb.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">7</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div class="col-name-l">IM I. Schneider</div><div class="col-res">½ : ½</div><div class="col-name-r">GM A. Orlov</div><div class="col-flag-container"><img src="flags/fide.svg" class="flag"></div><div></div></div>
+        <div class="match-grid-row board-row"><div class="col-nr">8</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div class="col-name-l">IM M. Ermitsch</div><div class="col-res">½ : ½</div><div class="col-name-r">GM F. Levin</div><div class="col-flag-container"><img src="flags/de.svg" class="flag"></div><div></div></div>
+    </div>
+
+    <div class="table-block-wrapper">
+        <div class="section-header">Aktuelle Tabelle</div>
+        <div class="split-table-container">
+            <div>
+                <table class="league-table">
+                    <thead><tr><th class="col-rank">Pl.</th><th class="col-team">Mannschaft</th><th class="col-points">MP</th><th class="col-points">BP</th></tr></thead>
+                    <tbody>
+                        <tr><td class="col-rank">1.</td><td>SC Viernheim</td><td class="col-points">24</td><td class="col-points">68.0</td></tr>
+                        <tr><td class="col-rank">2.</td><td>OSG Baden-Baden</td><td class="col-points">21</td><td class="col-points">60.5</td></tr>
+                        <tr><td class="col-rank">3.</td><td>Sfr. Wolfhagen</td><td class="col-points">20</td><td class="col-points">58.0</td></tr>
+                        <tr><td class="col-rank">4.</td><td>FC Bayern München</td><td class="col-points">14</td><td class="col-points">51.5</td></tr>
+                        <tr><td class="col-rank">5.</td><td>FC St. Pauli</td><td class="col-points">13</td><td class="col-points">48.5</td></tr>
+                        <tr><td class="col-rank">6.</td><td>SV Werder Bremen</td><td class="col-points">13</td><td class="col-points">45.0</td></tr>
+                        <tr><td class="col-rank">7.</td><td>SG Solingen</td><td class="col-points">12</td><td class="col-points">48.5</td></tr>
+                        <tr><td class="col-rank">8.</td><td>Düsseldorfer SK</td><td class="col-points">11</td><td class="col-points">46.0</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <table class="league-table">
+                    <thead><tr><th class="col-rank">Pl.</th><th class="col-team">Mannschaft</th><th class="col-points">MP</th><th class="col-points">BP</th></tr></thead>
+                    <tbody>
+                        <tr><td class="col-rank">9.</td><td>SK Kirchweyhe</td><td class="col-points">10</td><td class="col-points">46.5</td></tr>
+                        <tr><td class="col-rank">10.</td><td>SV Deggendorf</td><td class="col-points">10</td><td class="col-points">45.5</td></tr>
+                        <tr><td class="col-rank">11.</td><td>SF Deizisau</td><td class="col-points">10</td><td class="col-points">45.0</td></tr>
+                        <tr><td class="col-rank">12.</td><td>Hamburger SK</td><td class="col-points">10</td><td class="col-points">44.5</td></tr>
+                        <tr><td class="col-rank">13.</td><td>SC Heimbach-Weis-N.</td><td class="col-points">8</td><td class="col-points">44.5</td></tr>
+                        <tr class="relegation-line"><td class="col-rank">14.</td><td>MSA Zugzwang</td><td class="col-points">7</td><td class="col-points">43.0</td></tr>
+                        <tr><td class="col-rank">15.</td><td>SF Berlin</td><td class="col-points">6</td><td class="col-points">39.5</td></tr>
+                        <tr><td class="col-rank">16.</td><td>USV TU Dresden</td><td class="col-points">3</td><td class="col-points">33.5</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="table-footer">mit freundlicher Unterstützung von <img src="logos/uka.png" class="sponsor-logo"></div>
+    </div>
+</body>
+</html>

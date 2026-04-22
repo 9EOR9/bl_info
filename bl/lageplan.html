@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Lageplan 3D-Ansicht WBH - Isometrisch</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Definition der halbtransparenten Stockwerksfarben (RGBA) */
+            --floor-color-eg: rgba(0, 229, 255, 0.5); /* Halbtransparentes Cyan */
+            --floor-color-1og: rgba(255, 215, 0, 0.5); /* Halbtransparentes Gold/Gelb */
+            --floor-color-5og: rgba(220, 20, 60, 0.5);   /* Halbtransparentes Crimson/Rot */
+            
+            /* Farbe für die Markierungen und Symbole */
+            --color-mark: #ff3d00;      /* Rot für Spielbereiche, F und I */
+            --color-text: #ffffff;      /* Weiß für Stockwerksbezeichnungen */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            background: #111; /* Dunkler Hintergrund für Infoscreen */
+            color: var(--color-text);
+            
+            /* Portrait Definition (für die Vorschau im Browser) */
+            width: 2160px; height: 3840px;
+            overflow: hidden;
+            padding: 100px;
+        }
+
+        /* Container für den Lageplan auf der linken Seite */
+        .lageplan-sidebar {
+            width: 700px; /* Breite der Sidebar */
+            display: flex;
+            flex-direction: column;
+            gap: 150px; /* Abstand zwischen den Stockwerksgrafiken */
+        }
+
+        /* Styling für die SVG-Grafik */
+        svg {
+            width: 100%; /* Füllt die Breite der Sidebar */
+            height: auto;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 50px;
+            background: rgba(0,0,0,0.3);
+            
+            /* Ein leichter Glow-Effekt für Hochwertigkeit */
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.1));
+        }
+
+        /* --- SVG Klassen-Definitionen (Isometrische Vektoren) --- */
+        
+        /* Basisklasse für die Stockwerksflächen */
+        .svg-floor { 
+            stroke: rgba(255,255,255,0.2); 
+            stroke-width: 3px; 
+        }
+        
+        /* Spezifische Stockwerksfarben */
+        .svg-floor-eg  { fill: var(--floor-color-eg); }
+        .svg-floor-1og { fill: var(--floor-color-1og); }
+        .svg-floor-5og { fill: var(--floor-color-5og); }
+        
+        /* Klasse für die Spielbereichs-Markierungen */
+        .svg-mark-area { 
+            fill: var(--color-mark); 
+            stroke: none;
+        }
+        
+        /* Klasse für die Symbole (F und I) */
+        .svg-symbol { 
+            fill: none; 
+            stroke: var(--color-mark); 
+            stroke-width: 6px; 
+            font-size: 100px; /* Größe der Buchstaben */
+            font-family: 'Roboto Condensed', sans-serif;
+            font-weight: 700;
+        }
+        
+        /* Klasse für die Stockwerksbezeichnungen (z.B. "5. OG") */
+        .svg-text-label {
+            fill: var(--color-text);
+            font-size: 70px;
+            font-family: 'Roboto Condensed', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="lageplan-sidebar">
+
+        <svg viewBox="0 0 700 900">
+            
+            <path class="svg-floor svg-floor-eg" d="M350,850 L50,650 L650,650 Z" />
+            
+            <path class="svg-mark-area" d="M350,800 L120,670 L580,670 Z" />
+            
+            <text x="500" y="780" class="svg-symbol">I</text>
+            
+            <text x="350" y="870" text-anchor="middle" class="svg-text-label">EG</text>
+
+            
+            <path class="svg-floor svg-floor-1og" d="M350,550 L50,350 L650,350 Z" />
+            
+            <rect class="svg-mark-area" x="120" y="370" width="180" height="120" rx="10" />
+            
+            <text x="120" y="410" class="svg-symbol">F</text>
+            
+            <text x="350" y="570" text-anchor="middle" class="svg-text-label">1. OG</text>
+            
+            
+            <path class="svg-floor svg-floor-5og" d="M350,250 L50,50 L650,50 Z" />
+            
+            <path class="svg-mark-area" d="M100,100 L150,150 Q350,20 550,150 L600,100 Q350,0 100,100 Z" />
+            
+            <text x="350" y="270" text-anchor="middle" class="svg-text-label">5. OG</text>
+            
+        </svg>
+
+    </div>
+
+</body>
+</html>
