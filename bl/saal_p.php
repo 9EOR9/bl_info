@@ -398,17 +398,14 @@ async function validateCameras() {
             clearTimeout(timeoutId);
 
             if (data.status === 'online') {
-                c.display.innerHTML = `${key.toUpperCase()}: <span style="color:#0f0">ONLINE</span>`;
                 if (c.img.src.includes('.jpg')) {
                     c.img.src = c.streamUrl + '?t=' + Date.now();
                 }
             } else {
-                c.display.innerHTML = `${key.toUpperCase()}: <span style="color:#f00">CAM OFFLINE</span>`;
                 c.img.src = c.fallback;
             }
         } catch (e) {
             // Hier fangen wir Netzwerkfehler ab (z.B. DNS-Fehler oder Timeout)
-            c.display.innerHTML = `${key.toUpperCase()}: <span style="color:#ffa500">NET ERROR (${e.name})</span>`;
             c.img.src = c.fallback;
         }
     }
@@ -419,10 +416,6 @@ setInterval(validateCameras, 10000);
 validateCameras();
 
 </script>
-<div id="debug-status" style="position: fixed; bottom: 10px; right: 10px; background: rgba(0,0,0,0.8); color: #0f0; padding: 15px; border-radius: 10px; font-family: monospace; font-size: 1.2rem; z-index: 9999; border: 1px solid #444;">
-    <div style="font-weight: bold; color: var(--accent-gold); margin-bottom: 5px;">DEBUG MONITOR</div>
-    <div id="status-local">Lokal: Checking...</div>
-    <div id="status-remote">Remote: Checking...</div>
 </div>
 </body>
 </html>
