@@ -25,14 +25,14 @@ if (isset($_GET['runde'])) {
 $location = isset($_GET['location']) ? intval($_GET['location']) : 1;
 if ($location === 1) {
     $title_saal = "Atrium";
-    $cam_local   = "http://pi5-1:8080/stream";
+    $cam_local   = "http://localhost:8080/stream";
     $img_local   = "img/saal1.jpg"; // Ersatzbild Atrium
     $cam_remote  = "http://pi5-2:8080/stream";
     $img_remote  = "img/saal2.jpg"; // Ersatzbild Saal 2
     $label_remote = "Hans-Jochen Vogel Saal";
 } else {
     $title_saal = "Hans-Jochen Vogel Saal";
-    $cam_local   = "http://pi5-2:8080/stream";
+    $cam_local   = "http://localhost:8080/stream";
     $img_local   = "img/saal2.jpg"; // Ersatzbild Saal 2
     $cam_remote  = "http://pi5-1:8080/stream";
     $img_remote  = "img/saal1.jpg"; // Ersatzbild Atrium
