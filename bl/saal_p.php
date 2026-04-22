@@ -378,7 +378,7 @@ async function validateCameras() {
         remote: {
             img: document.getElementById('img-remote'),
             // Remote wird der Partner-Pi gefragt (via mDNS oder Tailscale)
-            checkUrl: 'http://<?php echo ($location == 1 ? "pi5-2" : "pi5-1"); ?>.local/bl/check_cam.php',
+            checkUrl: 'http://<?php echo ($location == 1 ? "pi5-2" : "pi5-1"); ?>local/bl/check_cam.php',
             fallback: '<?php echo $img_remote; ?>',
             streamUrl: '<?php echo $cam_remote_local; ?>'
         }
