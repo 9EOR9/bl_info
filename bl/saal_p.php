@@ -11,26 +11,22 @@ if (isset($_GET['runde'])) {
     }
 }
 
+// Location des Rechners (nur wichtig für die URL-Pfade zum Partner)
 $location = isset($_GET['location']) ? intval($_GET['location']) : 1;
 
-// Definition der Pfade für beide Szenarien
-if ($location === 1) {
-    $title_saal = "Atrium";
-    $cam_local   = "http://localhost:8080/stream";
-    $img_local   = "img/saal1.jpg";
-    $cam_remote_local = "http://pi5-2.local:8080/stream"; 
-    $img_remote  = "img/saal2.jpg";
-    $label_remote = "Hans-Jochen Vogel Saal";
-    $remote_check_url = "http://pi5-2.local/bl/check_cam.php";
-} else {
-    $title_saal = "Hans-Jochen Vogel Saal";
-    $cam_local   = "http://localhost:8080/stream";
-    $img_local   = "img/saal2.jpg";
-    $cam_remote_local = "http://pi5-1.local:8080/stream";
-    $img_remote  = "img/saal1.jpg";
-    $label_remote = "Atrium";
-    $remote_check_url = "http://pi5-1.local/bl/check_cam.php";
-}
+/**
+ * LOGIK-DEFINITION:
+ * Saal 1 (Atrium) ist immer Kamera 1 an pi5-1
+ * Saal 2 (HJV Saal) ist immer Kamera 2 an pi5-2
+ */
+
+// Pfade für Kamera 1 (Atrium)
+$cam1_url   = ($location == 1) ? "http://localhost:8080/stream" : "http://pi5-1.local:8080/stream";
+$cam1_check = ($location == 1) ? "check_cam.php" : "http://pi5-1.local/bl/check_cam.php";
+
+// Pfade für Kamera 2 (HJV Saal)
+$cam2_url   = ($location == 2) ? "http://localhost:8080/stream" : "http://pi5-2.local:8080/stream";
+$cam2_check = ($location == 2) ? "check_cam.php" : "http://pi5-2.local/bl/check_cam.php";
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -94,9 +90,6 @@ if ($location === 1) {
         .cam-placeholder { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; border-radius: 15px; background: #000; }
         .cam-container { position: relative; width: 100%; margin-bottom: 15px; border-radius: 15px; overflow: hidden; }
         .cam-label { position: absolute; top: 15px; left: 15px; background: rgba(0, 0, 0, 0.6); color: white; padding: 5px 15px; border-radius: 10px; font-size: 1.4rem; font-weight: bold; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); z-index: 10; }
-        thead th { font-size: 1.6rem; color: #aaa; font-weight: 400; text-transform: uppercase; padding: 10px; text-align: left; border-bottom: 2px solid rgba(255,255,255,0.2); }
-        .tr-zebra { background: var(--zebra-bg); }
-        .relegation-line { border-top: 5px solid rgba(255, 255, 255, 0.6) !important; }
         .schedule-table td { padding: 8px 10px; font-size: 1.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); vertical-align: top; }
         .time-col { color: var(--accent-gold); font-weight: bold; width: 120px; }
         .day-label { color: #aaaaaa !important; font-weight: bold; font-size: 2.8rem !important; padding-bottom: 5px !important; }
@@ -128,12 +121,12 @@ if ($location === 1) {
                 <div class="section-header">Turniersäle</div>
                 <div class="content-area" style="padding: 15px;">
                     <div class="cam-container">
-                        <div class="cam-label"><?php echo $title_saal; ?> (Lokal)</div>
-                        <img src="<?php echo $cam_local; ?>" id="img-local" class="cam-placeholder">
+                        <div class="cam-label">Atrium</div>
+                        <img src="<?php echo $cam1_url; ?>" id="img-cam1" class="cam-placeholder">
                     </div>
                     <div class="cam-container" style="margin-bottom: 0;">
-                        <div class="cam-label"><?php echo $label_remote; ?> (Remote)</div>
-                        <img src="<?php echo $cam_remote_local; ?>" id="img-remote" class="cam-placeholder"> 
+                        <div class="cam-label">Hans-Jochen Vogel Saal</div>
+                        <img src="<?php echo $cam2_url; ?>" id="img-cam2" class="cam-placeholder"> 
                     </div>
                 </div>
             </div>
@@ -198,8 +191,7 @@ function updateDashboard() {
                 let html = '<table style="width: 100%; font-size: 1.8rem; border-collapse: collapse;"><thead><tr><th>Pl.</th><th>Mannschaft</th><th style="text-align: right;">MP</th><th style="text-align: right;">BP</th></tr></thead><tbody>';
                 data.tabelle.forEach((t, i) => {
                     const zebra = (i % 2 === 1) ? 'class="tr-zebra"' : '';
-                    const relegation = (parseInt(t.platz) === 14) ? 'relegation-line' : '';
-                    html += `<tr class="${zebra.includes('tr-zebra') ? 'tr-zebra' : ''} ${relegation}" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    html += `<tr class="${zebra.includes('tr-zebra') ? 'tr-zebra' : ''}" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
                         <td style="padding: 10px 8px; color: #ffffff; font-weight: bold;">${t.platz}</td>
                         <td style="padding: 10px 8px;">${t.team}</td>
                         <td style="padding: 10px 8px; text-align: right; font-weight: bold; color: var(--accent-gold);">${t.mp}</td>
@@ -233,14 +225,6 @@ function updateDashboard() {
                                 <div style="flex: 1; display: flex; align-items: center; justify-content: flex-end; white-space: nowrap;">${b.name_g}${b.titel_g ? '<span style="color:#bbb; font-size:1.4rem; margin-left:5px;">'+b.titel_g+'</span>' : ''}${flagG}</div>
                             </div>`;
                         });
-                    } else {
-                        for(let i=1; i<=8; i++) {
-                            html += `<div class="brett-row" style="color: rgba(255,255,255,0.2);">
-                                <div style="flex: 1;">Brett ${i}</div>
-                                <div style="width: 95px; text-align: center;">- : -</div>
-                                <div style="flex: 1; text-align: right;"></div>
-                            </div>`;
-                        }
                     }
                     html += `</div>`;
                 });
@@ -250,18 +234,19 @@ function updateDashboard() {
         .catch(err => console.error("Fetch Error:", err));
 }
 
+// Konfiguration der Kameras
 const camConfigs = {
-    local: {
-        img: document.getElementById('img-local'),
-        checkUrl: 'check_cam.php',
-        streamUrl: '<?php echo $cam_local; ?>',
-        fallback: '<?php echo $img_local; ?>'
+    cam1: {
+        img: document.getElementById('img-cam1'),
+        checkUrl: '<?php echo $cam1_check; ?>',
+        streamUrl: '<?php echo $cam1_url; ?>',
+        fallback: 'img/saal1.jpg'
     },
-    remote: {
-        img: document.getElementById('img-remote'),
-        checkUrl: '<?php echo $remote_check_url; ?>',
-        streamUrl: '<?php echo $cam_remote_local; ?>',
-        fallback: '<?php echo $img_remote; ?>'
+    cam2: {
+        img: document.getElementById('img-cam2'),
+        checkUrl: '<?php echo $cam2_check; ?>',
+        streamUrl: '<?php echo $cam2_url; ?>',
+        fallback: 'img/saal2.jpg'
     }
 };
 
