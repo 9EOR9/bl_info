@@ -25,19 +25,15 @@ $location = isset($_GET['location']) ? intval($_GET['location']) : 1;
 if ($location == 1) {
     $url_oben  = "http://localhost:8080/stream";
     $check_oben = "check_cam.php";
+    $url_unten  = "http://pi5-1.local:8080/stream";
+    $check_unten = "http://pi5-1.local/bl/check_cam.php";
 } else {
-    $url_oben  = "http://pi5-1.local:8080/stream";
-    $check_oben = "http://pi5-1.local/bl/check_cam.php";
-}
-
-// Kamera UNTEN (HJV Saal / pi5-2)
-if ($location == 2) {
+    $url_oben  = "http://pi5-2.local:8080/stream";
+    $check_oben = "http://pi5-2.local/bl/check_cam.php";
     $url_unten  = "http://localhost:8080/stream";
     $check_unten = "check_cam.php";
-} else {
-    $url_unten  = "http://pi5-2.local:8080/stream";
-    $check_unten = "http://pi5-2.local/bl/check_cam.php";
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="de">
