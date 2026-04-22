@@ -364,32 +364,58 @@ const configs = {
 };
 
 async function validateCameras() {
-    for (let key in configs) {
-        const cfg = configs[key];
-        const img = document.getElementById(cfg.imgId);
+    // Definition der Ziele
+    const isPi1 = window.location.hostname.includes('pi5-1') || <?php echo $location; ?> === 1;
+    
+    const targets = {
+        local: {
+            img: document.getElementById('img-local'),
+            // Lokal wird immer die eigene Hardware direkt am Pi gefragt
+            checkUrl: 'check_cam.php', 
+            fallback: '<?php echo $img_local; ?>',
+            streamUrl: '<?php echo $cam_local; ?>'
+        },
+        remote: {
+            img: document.getElementById('img-remote'),
+            // Remote wird der Partner-Pi gefragt (via mDNS oder Tailscale)
+            checkUrl: 'http://<?php echo ($location == 1 ? "pi5-2" : "pi5-1"); ?>.local/bl/check_cam.php',
+            fallback: '<?php echo $img_remote; ?>',
+            streamUrl: '<?php echo $cam_remote_local; ?>'
+        }
+    };
+
+    for (let key in targets) {
+        const t = targets[key];
+        if (!t.img) continue;
 
         try {
-            const response = await fetch(cfg.checkUrl, { timeout: 2000 });
+            // Wir setzen einen kurzen Timeout, damit das Dashboard nicht hakt
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2500);
+
+            const response = await fetch(t.checkUrl, { signal: controller.signal });
             const data = await response.json();
+            clearTimeout(timeoutId);
 
             if (data.status === 'online') {
-                // Nur zurückschalten, wenn wir aktuell das Standbild zeigen
-                if (img.src.includes('.jpg')) {
-                    img.src = cfg.streamUrl + '?t=' + Date.now();
+                // Falls wir gerade ein Standbild zeigen, schalten wir zurück auf Stream
+                if (t.img.src.includes('.jpg')) {
+                    t.img.src = t.streamUrl + '?t=' + Date.now();
                 }
             } else {
-                img.src = cfg.fallback;
+                // Kamera meldet Hardware-Fehler am Quell-Gerät
+                t.img.src = t.fallback;
             }
         } catch (e) {
-            // Falls der ganze Pi oder das Skript nicht erreichbar ist
-            img.src = cfg.fallback;
+            // Netzwerk-Fehler (Partner-Pi ist aus oder WLAN blockiert)
+            console.log("Check failed for " + key + ": " + e.message);
+            t.img.src = t.fallback;
         }
     }
 }
 
 // Alle 10 Sekunden prüfen
 setInterval(validateCameras, 10000);
-// Einmal beim Start ausführen
 validateCameras();
 
 </script>
