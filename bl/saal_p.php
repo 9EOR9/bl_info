@@ -216,22 +216,16 @@ if ($location === 1) {
             <div class="glass-box">
                 <div class="section-header">Turniersäle</div>
                 <div class="content-area" style="padding: 15px;">
-									<div class="cam-container">
-											<div class="cam-label"><?php echo $title_saal; ?> (Live)</div>
-											<img src="<?php echo $cam_local; ?>" 
-													 class="cam-placeholder" 
-													 style="background: #000;" 
-													 onerror="this.onerror=null; this.src='<?php echo $img_local; ?>';">
-									</div>
+								<div class="cam-container">
+										<div class="cam-label"><?php echo $title_saal; ?> (Lokal)</div>
+										<img src="<?php echo $cam_local; ?>" id="img-local" class="cam-placeholder">
+								</div>
 
-									<div class="cam-container" style="margin-bottom: 0;">
-											<div class="cam-label"><?php echo $label_remote; ?> (Remote)</div>
-											<img src="<?php echo $cam_remote; ?>" 
-													 class="cam-placeholder" 
-													 style="background: #000;" 
-													 onerror="this.onerror=null; this.src='<?php echo $img_remote; ?>';"> 
+								<div class="cam-container" style="margin-bottom: 0;">
+										<div class="cam-label"><?php echo $label_remote; ?> (Remote)</div>
+										<img src="<?php echo $cam_remote_local; ?>" id="img-remote" class="cam-placeholder"> 
 									</div>
-                </div>
+								</div>
             </div>
             <div class="glass-box" style="flex-grow: 1;">
                 <div class="section-header">Zeitplan</div>
@@ -354,36 +348,50 @@ function updateDashboard() {
 updateDashboard();
 setInterval(updateDashboard, 60000);
 
-// Funktion zur Überprüfung der Kamera-Verfügbarkeit
-function checkCams() {
-    const cams = [
-        { id: 'local', url: '<?php echo $cam_local; ?>', fallback: '<?php echo $img_local; ?>' },
-        { id: 'remote', url: '<?php echo $cam_remote; ?>', fallback: '<?php echo $img_remote; ?>' }
-    ];
+const configs = {
+    local: {
+        imgId: 'img-local',
+        streamUrl: '<?php echo $cam_local; ?>',
+        fallback: '<?php echo $img_local; ?>',
+        checkUrl: 'check_cam.php' // Lokal auf diesem Pi
+    },
+    remote: {
+        imgId: 'img-remote',
+        streamUrl: '<?php echo $cam_remote_local; ?>',
+        fallback: '<?php echo $img_remote; ?>',
+        checkUrl: 'http://<?php echo ($location==1 ? "pi5-2" : "pi5-1"); ?>.local/bl/check_cam.php'
+    }
+};
 
-    cams.forEach(cam => {
-        const imgElement = document.querySelector(`img[data-cam-type="${cam.id}"]`);
-        if (!imgElement) return;
+async function validateCameras() {
+    for (let key in configs) {
+        const cfg = configs[key];
+        const img = document.getElementById(cfg.imgId);
 
-        // Kleiner "Ping" an das Stream-Terminal
-        fetch(cam.url, { method: 'HEAD', mode: 'no-cors' })
-            .then(() => {
-                // Wenn erreichbar und aktuell das Fallback-Bild zeigt -> zurück zum Stream
-                if (imgElement.src.includes('.jpg')) {
-                    imgElement.src = cam.url + '?t=' + new Date().getTime();
+        try {
+            const response = await fetch(cfg.checkUrl, { timeout: 2000 });
+            const data = await response.json();
+
+            if (data.status === 'online') {
+                // Nur zurückschalten, wenn wir aktuell das Standbild zeigen
+                if (img.src.includes('.jpg')) {
+                    img.src = cfg.streamUrl + '?t=' + Date.now();
                 }
-            })
-            .catch(() => {
-                // Wenn nicht erreichbar -> Fallback setzen
-                imgElement.src = cam.fallback;
-            });
-    });
+            } else {
+                img.src = cfg.fallback;
+            }
+        } catch (e) {
+            // Falls der ganze Pi oder das Skript nicht erreichbar ist
+            img.src = cfg.fallback;
+        }
+    }
 }
 
-// Damit das JS die Bilder findet, fügen wir im HTML oben data-cam-type="local" bzw. "remote" hinzu
-// (Ändere die img-Tags oben entsprechend ab: <img data-cam-type="local" ...>)
+// Alle 10 Sekunden prüfen
+setInterval(validateCameras, 10000);
+// Einmal beim Start ausführen
+validateCameras();
 
-setInterval(checkCams, 60000); // Alle 60 Sekunden prüfen
 </script>
 </body>
 </html>
