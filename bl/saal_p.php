@@ -12,30 +12,31 @@ if (isset($_GET['runde'])) {
     }
 }
 
-// 2. Location des aktuellen Screens bestimmen
+// 2. Location bestimmen (?location=1 oder ?location=2)
 $location = isset($_GET['location']) ? intval($_GET['location']) : 1;
 
 /**
- * ATRIUM (Kamera 1) ist physisch an pi5-1
- * HJV SAAL (Kamera 2) ist physisch an pi5-2
+ * VEREINFACHTE LOGIK:
+ * Oben (Atrium) = immer pi5-1
+ * Unten (HJV Saal) = immer pi5-2
  */
 
-// Pfade für ATRIUM
+// Kamera OBEN (Atrium / pi5-1)
 if ($location == 1) {
-    $atrium_check  = "check_cam.php"; // Lokal auf Pi 1
-    $atrium_stream = "http://localhost:8080/stream";
+    $url_oben  = "http://localhost:8080/stream";
+    $check_oben = "check_cam.php";
 } else {
-    $atrium_check  = "http://pi5-1.local/bl/check_cam.php"; // Remote von Pi 2 aus
-    $atrium_stream = "http://pi5-1.local:8080/stream";
+    $url_oben  = "http://pi5-1.local:8080/stream";
+    $check_oben = "http://pi5-1.local/bl/check_cam.php";
 }
 
-// Pfade für HJV SAAL
+// Kamera UNTEN (HJV Saal / pi5-2)
 if ($location == 2) {
-    $hjv_check  = "check_cam.php"; // Lokal auf Pi 2
-    $hjv_stream = "http://localhost:8080/stream";
+    $url_unten  = "http://localhost:8080/stream";
+    $check_unten = "check_cam.php";
 } else {
-    $hjv_check  = "http://pi5-2.local/bl/check_cam.php"; // Remote von Pi 1 aus
-    $hjv_stream = "http://pi5-2.local:8080/stream";
+    $url_unten  = "http://pi5-2.local:8080/stream";
+    $check_unten = "http://pi5-2.local/bl/check_cam.php";
 }
 ?>
 <!DOCTYPE html>
@@ -131,7 +132,7 @@ if ($location == 2) {
 
     <div class="dashboard-grid">
         <section class="glass-box">
-            <div class="section-header" id="runde-header">Runde <?php echo $runde; ?></div>
+            <div class="section-header">Runde <?php echo $runde; ?></div>
             <div class="content-area" id="results-target"></div>
         </section>
 
@@ -146,12 +147,11 @@ if ($location == 2) {
                 <div class="content-area" style="padding: 15px;">
                     <div class="cam-container">
                         <div class="cam-label">Atrium</div>
-                        <img src="<?php echo $atrium_stream; ?>" id="img-cam1" class="cam-placeholder">
+                        <img src="<?php echo $url_oben; ?>" id="img-oben" class="cam-placeholder">
                     </div>
-
                     <div class="cam-container" style="margin-bottom: 0;">
                         <div class="cam-label">Hans-Jochen Vogel Saal</div>
-                        <img src="<?php echo $hjv_stream; ?>" id="img-cam2" class="cam-placeholder"> 
+                        <img src="<?php echo $url_unten; ?>" id="img-unten" class="cam-placeholder"> 
                     </div>
                 </div>
             </div>
@@ -269,49 +269,47 @@ function updateDashboard() {
         .catch(err => console.error("Fetch Error:", err));
 }
 
-// --- KAMERA LOGIK (ISOLIERT) ---
-const cfgCam1 = {
-    img: document.getElementById('img-cam1'),
-    check: '<?php echo $atrium_check; ?>',
-    stream: '<?php echo $atrium_stream; ?>',
-    fallback: 'img/saal1.jpg'
+// --- KAMERA KONFIGURATION ---
+const cams = {
+    oben: {
+        img: document.getElementById('img-oben'),
+        check: '<?php echo $check_oben; ?>',
+        stream: '<?php echo $url_oben; ?>',
+        fallback: 'img/saal1.jpg'
+    },
+    unten: {
+        img: document.getElementById('img-unten'),
+        check: '<?php echo $check_unten; ?>',
+        stream: '<?php echo $url_unten; ?>',
+        fallback: 'img/saal2.jpg'
+    }
 };
 
-const cfgCam2 = {
-    img: document.getElementById('img-cam2'),
-    check: '<?php echo $hjv_check; ?>',
-    stream: '<?php echo $hjv_stream; ?>',
-    fallback: 'img/saal2.jpg'
-};
-
-async function checkSingleCam(c) {
-    if (!c.img) return;
-    try {
-        const response = await fetch(c.check + '?t=' + Date.now(), { cache: "no-store", mode: 'cors' });
-        const data = await response.json();
-        if (data.status === 'online') {
-            if (c.img.src.includes('.jpg')) {
-                c.img.src = c.stream + '?t=' + Date.now();
+async function validateCams() {
+    for (let key in cams) {
+        const c = cams[key];
+        try {
+            const response = await fetch(c.check + '?t=' + Date.now(), { cache: "no-store", mode: 'cors' });
+            const data = await response.json();
+            if (data.status === 'online') {
+                if (c.img.src.includes('.jpg')) {
+                    c.img.src = c.stream + '?t=' + Date.now();
+                }
+            } else {
+                c.img.src = c.fallback;
             }
-        } else {
-            c.img.src = c.fallback;
-        }
-    } catch (e) {
-        if (!c.img.src.includes('.jpg')) {
-            c.img.src = c.fallback;
+        } catch (e) {
+            if (!c.img.src.includes('.jpg')) {
+                c.img.src = c.fallback;
+            }
         }
     }
 }
 
-function validateAll() {
-    checkSingleCam(configCam1);
-    checkSingleCam(configCam2);
-}
-
 updateDashboard();
 setInterval(updateDashboard, 60000);
-setInterval(validateAll, 8000);
-validateAll();
+setInterval(validateCams, 8000);
+validateCams();
 </script>
 </body>
 </html>
