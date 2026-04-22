@@ -3,50 +3,40 @@
 if (isset($_GET['runde'])) {
     $runde = intval($_GET['runde']);
 } else {
-    $heute = date('d.m'); // Format: Tag.Monat (z.B. 24.04)
-    
+    $heute = date('d.m'); 
     switch ($heute) {
-        case '24.04':
-            $runde = 13;
-            break;
-        case '25.04':
-            $runde = 14;
-            break;
-        case '26.04':
-            $runde = 15;
-            break;
-        default:
-            $runde = 12;
-            break;
+        case '24.04': $runde = 13; break;
+        case '25.04': $runde = 14; break;
+        case '26.04': $runde = 15; break;
+        default:      $runde = 12; break;
     }
 }
 
-// 2. Location bestimmen 
-// location=1 -> Atrium (pi5-1)
-// location=2 -> 5. OG (pi5-2)
+// 2. Location bestimmen (MUSS beim Aufruf in der URL stehen: ?location=1 oder ?location=2)
 $location = isset($_GET['location']) ? intval($_GET['location']) : 1;
 
 /**
- * REINSTE PFAD-LOGIK:
- * Wir definieren die URLs für BEIDE Kameras basierend darauf, wo wir sind.
+ * KAMERA-KONFIGURATION
+ * Saal 1 (Atrium) ist IMMER an pi5-1
+ * Saal 2 (HJV Saal) ist IMMER an pi5-2
  */
 
-// Kamera 1 (Atrium)
+// Konfiguration für ATRIUM (Kamera 1)
 if ($location == 1) {
+    $cam1_check  = "check_cam.php"; // Lokal
     $cam1_stream = "http://localhost:8080/stream";
-    $cam1_check  = "check_cam.php";
 } else {
+    $cam1_check  = "http://pi5-1.local/bl/check_cam.php"; // Remote
     $cam1_stream = "http://pi5-1.local:8080/stream";
-    $cam1_check  = "http://pi5-1.local/bl/check_cam.php";
 }
 
-// Kamera 2 (HJV Saal)
+// Konfiguration für HJV SAAL (Kamera 2)
 if ($location == 2) {
+    $cam2_check  = "check_cam.php"; // Lokal
     $cam2_stream = "http://localhost:8080/stream";
-    $cam2_check  = "check_cam.php";
 } else {
+    $cam2_check  = "http://pi5-2.local/bl/check_cam.php"; // Remote
     $cam2_stream = "http://pi5-2.local:8080/stream";
-    $cam2_check  = "http://pi5-2.local/bl/check_cam.php";
 }
 ?>
 <!DOCTYPE html>
@@ -85,7 +75,6 @@ if ($location == 2) {
 
         body { display: flex; flex-direction: column; padding: 35px; box-sizing: border-box; }
 
-        /* --- HEADER --- */
         .main-page-header {
             background: var(--header-bg-gradient);
             backdrop-filter: blur(25px);
@@ -94,108 +83,39 @@ if ($location == 2) {
             border-radius: var(--border-radius);
             margin-bottom: 25px;
             color: var(--text-black);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 30px; 
+            display: flex; justify-content: space-between; align-items: center; padding: 20px 30px; 
         }
 
-        .header-text-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            flex: 1;
-        }
-
-        .header-logo { 
-            height: 110px;
-            width: auto; 
-            vertical-align: middle; 
-            filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.2));
-        }
-
+        .header-text-container { display: flex; flex-direction: column; align-items: center; text-align: center; flex: 1; }
+        .header-logo { height: 110px; width: auto; vertical-align: middle; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.2)); }
         .main-page-header h1 { font-size: 4.5rem; margin: 0; text-transform: uppercase; font-weight: 700; line-height: 1; }
         .main-page-header p { font-size: 2.5rem; margin: 10px 0 0 0; opacity: 0.9; width: 100%; text-align: center; }
 
-        /* --- LAYOUT GRID --- */
-        .dashboard-grid {
-            display: grid; grid-template-columns: 2.1fr 1fr; gap: 35px; flex-grow: 1; min-height: 0;
-        }
-
-        .glass-box {
-            background: var(--glass-bg);
-            backdrop-filter: blur(var(--glass-blur));
-            border: var(--line-thickness) solid var(--accent-light);
-            border-radius: var(--border-radius);
-            overflow: hidden; display: flex; flex-direction: column;
-        }
-
-        .section-header {
-            background: linear-gradient(to bottom, rgba(235, 235, 235, 0.5) 0%, rgba(255, 255, 255, 0.78) 100%) !important;
-            color: var(--text-black) !important;
-            font-size: 3.2rem; font-weight: 700; padding: 12px;
-            text-align: center; text-transform: uppercase;
-        }
-
+        .dashboard-grid { display: grid; grid-template-columns: 2.1fr 1fr; gap: 35px; flex-grow: 1; min-height: 0; }
+        .glass-box { background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)); border: var(--line-thickness) solid var(--accent-light); border-radius: var(--border-radius); overflow: hidden; display: flex; flex-direction: column; }
+        .section-header { background: linear-gradient(to bottom, rgba(235, 235, 235, 0.5) 0%, rgba(255, 255, 255, 0.78) 100%) !important; color: var(--text-black) !important; font-size: 3.2rem; font-weight: 700; padding: 12px; text-align: center; text-transform: uppercase; }
         .content-area { flex-grow: 1; padding: 10px 25px; overflow-y: auto; scrollbar-width: none; }
 
-        /* --- ERGEBNISSE --- */
-        .match-container {
-            border-bottom: 3px solid rgba(255, 255, 255, 0.8);
-            margin-bottom: 18px;
-            padding-bottom: 12px; 
-        }
+        .match-container { border-bottom: 3px solid rgba(255, 255, 255, 0.8); margin-bottom: 18px; padding-bottom: 12px; }
         .match-container:last-child { border-bottom: none; }
-
-        .score-box {
-            display: inline-block;
-            width: 170px; height: 55px; line-height: 55px;
-            text-align: center; background: rgba(0, 0, 0, 0.7);
-            border-radius: 15px; border: 2px solid rgba(255, 255, 255, 0.4);
-            font-size: 2.8rem; font-weight: bold; color: var(--accent-gold);
-        }
-
+        .score-box { display: inline-block; width: 170px; height: 55px; line-height: 55px; text-align: center; background: rgba(0, 0, 0, 0.7); border-radius: 15px; border: 2px solid rgba(255, 255, 255, 0.4); font-size: 2.8rem; font-weight: bold; color: var(--accent-gold); }
         .team-logo { height: 45px; width: auto; vertical-align: middle; object-fit: contain; }
-        .logo-heim { margin-right: 15px; } 
-        .logo-gast { margin-left: 15px; }  
-
-        .brett-row {
-            display: flex; align-items: center; font-size: 1.7rem;
-            padding: 3px 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
+        .logo-heim { margin-right: 15px; } .logo-gast { margin-left: 15px; }  
+        .brett-row { display: flex; align-items: center; font-size: 1.7rem; padding: 3px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .brett-row:nth-child(even) { background: var(--zebra-bg); }
 
-        /* --- SIDEBAR --- */
         .sidebar { display: flex; flex-direction: column; gap: 30px; }
         .cam-placeholder { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; border-radius: 15px; background: #000; }
         .cam-container { position: relative; width: 100%; margin-bottom: 15px; border-radius: 15px; overflow: hidden; }
-        .cam-label {
-            position: absolute; top: 15px; left: 15px; background: rgba(0, 0, 0, 0.6);
-            color: white; padding: 5px 15px; border-radius: 10px; font-size: 1.4rem;
-            font-weight: bold; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); z-index: 10;
-        }
-
-        /* --- TABELLE --- */
+        .cam-label { position: absolute; top: 15px; left: 15px; background: rgba(0, 0, 0, 0.6); color: white; padding: 5px 15px; border-radius: 10px; font-size: 1.4rem; font-weight: bold; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); z-index: 10; }
+        
         thead th { font-size: 1.6rem; color: #aaa; font-weight: 400; text-transform: uppercase; padding: 10px; text-align: left; border-bottom: 2px solid rgba(255,255,255,0.2); }
         .tr-zebra { background: var(--zebra-bg); }
         .relegation-line { border-top: 5px solid rgba(255, 255, 255, 0.6) !important; }
 
-        /* --- ZEITPLAN --- */
-        .schedule-table td { 
-            padding: 8px 10px; 
-            font-size: 1.8rem; 
-            border-bottom: 1px solid rgba(255,255,255,0.1); 
-            vertical-align: top; 
-        }
+        .schedule-table td { padding: 8px 10px; font-size: 1.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); vertical-align: top; }
         .time-col { color: var(--accent-gold); font-weight: bold; width: 120px; }
-        .day-label { 
-            color: #aaaaaa !important;
-            font-weight: bold; 
-            font-size: 2.8rem !important; 
-            padding-bottom: 5px !important;
-        }
+        .day-label { color: #aaaaaa !important; font-weight: bold; font-size: 2.8rem !important; padding-bottom: 5px !important; }
         .spacer-row { height: 35px; border: none !important; }
     </style>
 </head>
@@ -221,6 +141,7 @@ if ($location == 2) {
                 <div class="section-header">Tabelle</div>
                 <div class="content-area" id="table-target"></div>
             </div>
+
             <div class="glass-box">
                 <div class="section-header">Turniersäle</div>
                 <div class="content-area" style="padding: 15px;">
@@ -228,13 +149,13 @@ if ($location == 2) {
                         <div class="cam-label">Atrium</div>
                         <img src="<?php echo $cam1_stream; ?>" id="img-cam1" class="cam-placeholder">
                     </div>
-
                     <div class="cam-container" style="margin-bottom: 0;">
                         <div class="cam-label">Hans-Jochen Vogel Saal</div>
                         <img src="<?php echo $cam2_stream; ?>" id="img-cam2" class="cam-placeholder"> 
                     </div>
                 </div>
             </div>
+
             <div class="glass-box" style="flex-grow: 1;">
                 <div class="section-header">Zeitplan</div>
                 <div class="content-area">
@@ -290,7 +211,6 @@ function updateDashboard() {
         .then(response => response.json())
         .then(data => {
             if (!data || data.error) return;
-
             const tableTarget = document.querySelector('#table-target');
             if (tableTarget && data.tabelle) {
                 data.tabelle.sort((a, b) => parseInt(a.platz) - parseInt(b.platz));
@@ -298,7 +218,6 @@ function updateDashboard() {
                 data.tabelle.forEach((t, i) => {
                     const zebra = (i % 2 === 1) ? 'class="tr-zebra"' : '';
                     const relegation = (parseInt(t.platz) === 14) ? 'relegation-line' : '';
-                    
                     html += `<tr class="${zebra.includes('tr-zebra') ? 'tr-zebra' : ''} ${relegation}" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
                         <td style="padding: 10px 8px; color: #ffffff; font-weight: bold;">${t.platz}</td>
                         <td style="padding: 10px 8px;">${t.team}</td>
@@ -309,7 +228,6 @@ function updateDashboard() {
                 html += '</tbody></table>';
                 tableTarget.innerHTML = html;
             }
-
             const resultsTarget = document.querySelector('#results-target');
             if (resultsTarget && data.begegnungen) {
                 let html = '';
@@ -318,19 +236,16 @@ function updateDashboard() {
                     const logoG = getLogoHtml(m.team_gast, 'gast');
                     const scoreH = m.score_heim !== null ? formatScore(m.score_heim) : "-";
                     const scoreG = m.score_gast !== null ? formatScore(m.score_gast) : "-";
-
                     html += `<div class="match-container">
                         <div style="display: flex; justify-content: space-between; align-items: center; font-size: 3.1rem; font-weight: bold; color: var(--accent-gold); margin-bottom: 12px;">
                             <div style="width: 43%; display: flex; align-items: center; white-space: nowrap; overflow: hidden;">${logoH}${m.team_heim}</div>
                             <div class="score-box">${scoreH} : ${scoreG}</div>
                             <div style="width: 43%; display: flex; align-items: center; justify-content: flex-end; white-space: nowrap; overflow: hidden;">${m.team_gast}${logoG}</div>
                         </div>`;
-
                     if (m.bretter && m.bretter.length > 0) {
                         m.bretter.forEach(b => {
                             const flagH = b.country_h !== 'xx' ? `<img src="flags/${b.country_h}.svg" style="height:18px; margin-right:10px; vertical-align:middle; border:1px solid rgba(255,255,255,0.2);">` : '<div style="width:28px; margin-right:10px;"></div>';
                             const flagG = b.country_g !== 'xx' ? `<img src="flags/${b.country_g}.svg" style="height:18px; margin-left:10px; vertical-align:middle; border:1px solid rgba(255,255,255,0.2);">` : '<div style="width:28px; margin-left:10px;"></div>';
-
                             html += `<div class="brett-row" style="color: white;">
                                 <div style="flex: 1; display: flex; align-items: center; white-space: nowrap;">${flagH}${b.titel_h ? '<span style="color:#bbb; font-size:1.4rem; margin-right:5px;">'+b.titel_h+'</span>' : ''}${b.name_h}</div>
                                 <div style="width: 95px; text-align: center; font-weight: bold; color: white; background: rgba(255,255,255,0.05); border-radius: 5px; margin: 0 12px;">${formatScore(b.erg_h)} : ${formatScore(b.erg_g)}</div>
@@ -354,15 +269,15 @@ function updateDashboard() {
         .catch(err => console.error("Fetch Error:", err));
 }
 
-// --- KAMERA LOGIK ---
-const cfgCam1 = {
+// --- KAMERA LOGIK (ISOLIERT) ---
+const configCam1 = {
     img: document.getElementById('img-cam1'),
     check: '<?php echo $cam1_check; ?>',
     stream: '<?php echo $cam1_stream; ?>',
     fallback: 'img/saal1.jpg'
 };
 
-const cfgCam2 = {
+const configCam2 = {
     img: document.getElementById('img-cam2'),
     check: '<?php echo $cam2_check; ?>',
     stream: '<?php echo $cam2_stream; ?>',
@@ -389,8 +304,8 @@ async function checkSingleCam(c) {
 }
 
 function validateAll() {
-    checkSingleCam(cfgCam1);
-    checkSingleCam(cfgCam2);
+    checkSingleCam(configCam1);
+    checkSingleCam(configCam2);
 }
 
 updateDashboard();
