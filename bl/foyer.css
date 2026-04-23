@@ -1,0 +1,187 @@
+<style>
+    /* --- 1. FONTS & BASIC RESET --- */
+    @font-face {
+        font-family: 'Roboto Condensed';
+        src: url('fonts/RobotoCondensed-VariableFont_wght.ttf') format('truetype-variations');
+        font-weight: 100 900;
+        font-style: normal;
+    }
+
+    :root {
+        --wbh-overlay: rgba(10, 10, 10, 0.9);
+        --gold: #c5a059;
+        --accent-gold: #c5a059;
+        --header-white: #ffffff;
+        --headline-width: 1750px;
+        --glass-bg: rgba(15, 15, 15, 0.85);
+        --glass-blur: 2px;
+        --accent-light: rgba(255, 255, 255, 0.25);
+        --text-black: #000000;
+        --border-radius: 40px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+        font-family: 'Roboto Condensed', sans-serif;
+        background: linear-gradient(var(--wbh-overlay), var(--wbh-overlay)), url('img/wbh.jpg') center/cover no-repeat;
+        width: 2160px; 
+        height: 3840px;
+        overflow: hidden;
+        display: flex; 
+        flex-direction: column; 
+    }
+
+    /* --- 2. FIXER RAHMEN (Kein Flackern) --- */
+    .header-bar {
+        width: 100%; 
+        background: var(--header-white);
+        padding: 90px 0; 
+        text-align: center;
+        border-bottom: 20px solid var(--gold);
+        box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+        z-index: 100;
+    }
+    .header-bar h1 { color: #000; font-size: 150px; text-transform: uppercase; letter-spacing: 6px; line-height: 1.1; }
+    .header-bar h2 { color: #000; font-size: 100px; text-transform: uppercase; margin-top: 20px; font-weight: 300; }
+
+    .footer-bar {
+        width: 100%; 
+        background: var(--header-white);
+        padding: 60px 0; 
+        text-align: center;
+        border-top: 20px solid var(--gold);
+        box-shadow: 0 -15px 50px rgba(0,0,0,0.6);
+        margin-top: auto;
+        display: flex; justify-content: center; align-items: center;
+        z-index: 100;
+    }
+    .logo-uka-footer { height: 300px; width: auto; object-fit: contain; }
+
+    /* --- 3. SLIDE LOGIK --- */
+    #viewport {
+        position: relative;
+        flex-grow: 1;
+        width: 100%;
+    }
+
+    .slide {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 1.5s ease-in-out;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .slide.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* --- 4. CONTENT STYLES (Seite 1: Weltklasse) --- */
+    .top-spacer { height: 150px; width: 100%; }
+    .player-row { display: flex; justify-content: center; gap: 40px; width: 100%; margin: 40px 0; position: relative; }
+    .row-top div:nth-child(1), .row-top div:nth-child(5) { transform: translateY(80px); }
+    .row-top div:nth-child(2), .row-top div:nth-child(4) { transform: translateY(40px); }
+    .row-bottom div:nth-child(1), .row-bottom div:nth-child(5) { transform: translateY(-80px); }
+    .row-bottom div:nth-child(2), .row-bottom div:nth-child(4) { transform: translateY(-40px); }
+
+    .player-circle {
+        width: 150px; height: 150px; border-radius: 50%; border: 4px solid var(--gold);
+        overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.8); background: #1a1a1a; position: relative;
+    }
+    .player-circle img { 
+        width: 100%; height: 100%; object-fit: cover; object-position: center 15%;
+        position: absolute; top: 0; left: 0; transition: opacity 1.8s ease-in-out; opacity: 0;
+    }
+    .player-circle img.active { opacity: 1; }
+
+    .weltklasse {
+        font-size: 210px; font-weight: 700; text-transform: uppercase; text-align: center;
+        color: var(--gold); letter-spacing: 20px; line-height: 1.0; text-shadow: 0 15px 45px #000; margin: 100px 0;
+    }
+	.willkommen-sektion {
+	    margin-top: 350px; /* Schiebt die Sektion deutlich weiter nach unten */
+	    text-align: center;
+	    width: 1600px;
+	    margin-left: auto;
+	    margin-right: auto;
+	    border-top: 6px solid var(--gold);    /* Goldene Linie oben */
+	    border-bottom: 6px solid var(--gold); /* Goldene Linie unten */
+	    padding: 60px 0;
+	}
+
+	.willkommen-sektion p {
+	    margin: 0;
+	    padding: 2px 0;
+	    color: white;
+	    /* Angleichung an die restliche Info-Schrift */
+	    font-size: 6.1rem; 
+	    line-height: 1.2;
+	}
+
+	/* "Willkommen zur zentralen" - Normal */
+	.intro-text {
+	    font-weight: 300;
+	}
+
+	/* "Schachbundesliga Endrunde" - FETT */
+	.highlight-text {
+	    font-weight: 800; /* Extra Fett */
+	    font-size: 6.1rem; /* Minimal größer für die Wirkung */
+	    color: var(--accent-gold); /* Optional in Gold, falls gewünscht */
+	}
+
+	/* Das Datum - Normal */
+	.datum-text {
+	    font-weight: 400;
+	    margin-top: 10px; /* Kleiner Abstand zum Text darüber */
+	}
+
+    /* --- 5. CONTENT STYLES (Seite 2: Lageplan) --- */
+    .content-wrapper { display: flex; flex: 1; width: 100%; padding: 20px 50px; gap: 30px; }
+    .column-left { width: 50%; display: flex; align-items: center; justify-content: center; }
+    .lageplan-img { width: 100%; height: auto; max-height: 90%; object-fit: contain; filter: drop-shadow(0 30px 60px rgba(0,0,0,0.7)); }
+    .column-right { width: 50%; display: flex; flex-direction: column; gap: 20px; justify-content: center; }
+
+    .glass-box {
+        background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur));
+        border: 1px solid var(--accent-light); border-radius: var(--border-radius);
+        overflow: hidden; display: flex; flex-direction: column;
+    }
+    .section-header {
+      background: linear-gradient(to bottom, rgba(235, 235, 235, 0.5) 0%, rgba(255, 255, 255, 0.78) 100%) !important;
+      color: var(--text-black) !important; 
+      /* Schriftgröße von 3rem auf 2.2rem senken */
+      font-size: 2.2rem; 
+      font-weight: 700; 
+      /* Padding halbieren für flachere Header */
+      padding: 10px; 
+      text-align: center; 
+      text-transform: uppercase;
+     }
+    .content-area { padding: 25px; color: white; }
+    .info-line { 
+        color: var(--accent-gold); font-weight: 700; display: block; padding-bottom: 10px;
+        margin-bottom: 15px; font-size: 2.2rem; text-align: center; border-bottom: 3px solid var(--gold);
+    }
+
+    .match-table { width: 100%; border-collapse: collapse; }
+    .match-table tr:nth-child(even) { background: rgba(255, 255, 255, 0.05); }
+    .match-table td { padding: 1px 5px; vertical-align: middle; font-size: 2.1rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .team-name { font-weight: 400; line-height: 1.2; font-size: 2.1rem; }
+    .logo-col { width: 80px; text-align: center; }
+    .team-logo-small { height: 55px; width: auto; object-fit: contain; }
+
+    .score-box-cell { width: 170px; text-align: center; }
+    .score-box {
+        display: inline-block; width: 140px; height: 60px; line-height: 60px;
+        text-align: center; background: rgba(0, 0, 0, 0.8); border-radius: 12px;
+        border: 2px solid var(--accent-gold); font-size: 2.0rem; font-weight: bold; color: var(--accent-gold);
+    }
+
+    .portrait-rabiega { width: 250px; height: auto; border-radius: 20px; margin: 15px auto; border: 2px solid var(--accent-gold); display: block; }
+    .kommentierung-content { font-size: 2.4rem; text-align: center; line-height: 1.3; }
+</style>

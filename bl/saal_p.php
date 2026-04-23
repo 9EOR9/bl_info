@@ -1,25 +1,9 @@
 <?php
-// 1. Rundenlogik
-if (isset($_GET['runde'])) {
-    $runde = intval($_GET['runde']);
-} else {
-    $heute = date('d.m'); 
-    switch ($heute) {
-        case '24.04': $runde = 13; break;
-        case '25.04': $runde = 14; break;
-        case '26.04': $runde = 15; break;
-        default:      $runde = 12; break;
-    }
-}
+	require_once 'runde.php';
 
 // 2. Location bestimmen (?location=1 oder ?location=2)
 $location = isset($_GET['location']) ? intval($_GET['location']) : 1;
 
-/**
- * VEREINFACHTE LOGIK:
- * Oben (Atrium) = immer pi5-1
- * Unten (HJV Saal) = immer pi5-2
- */
 
 // Kamera OBEN (Atrium / pi5-1)
 if ($location == 1) {
