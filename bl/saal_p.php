@@ -1,19 +1,35 @@
 <?php
-	require_once 'runde.php';
+// 1. Rundenlogik
+if (isset($_GET['runde'])) {
+    $runde = intval($_GET['runde']);
+} else {
+    $heute = date('d.m'); 
+    switch ($heute) {
+        case '24.04': $runde = 13; break;
+        case '25.04': $runde = 14; break;
+        case '26.04': $runde = 15; break;
+        default:      $runde = 12; break;
+    }
+}
 
 // 2. Location bestimmen (?location=1 oder ?location=2)
 $location = isset($_GET['location']) ? intval($_GET['location']) : 1;
 
+/**
+ * VEREINFACHTE LOGIK:
+ * Oben (Atrium) = immer pi5-1
+ * Unten (HJV Saal) = immer pi5-2
+ */
 
 // Kamera OBEN (Atrium / pi5-1)
 if ($location == 1) {
     $url_oben  = "http://localhost:8080/stream";
     $check_oben = "check_cam.php";
-    $url_unten  = "http://pi5-1.local:8080/stream";
-    $check_unten = "http://pi5-1.local/bl/check_cam.php";
+    $url_unten  = "http://192.168.0.29:8080/stream";
+    $check_unten = "http://192.168.0.29/bl/check_cam.php";
 } else {
-    $url_oben  = "http://pi5-2.local:8080/stream";
-    $check_oben = "http://pi5-2.local/bl/check_cam.php";
+    $url_oben  = "http://192.168.0.18:8080/stream";
+    $check_oben = "http://192.168.0.18/bl/check_cam.php";
     $url_unten  = "http://localhost:8080/stream";
     $check_unten = "check_cam.php";
 }

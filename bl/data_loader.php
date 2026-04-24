@@ -59,8 +59,8 @@ function getSchachData($runde = 12) {
                         'titel_h'   => $b->Ergebnis_Heim_Spieler_FIDE_Titel ?? "",
                         'country_h' => convertNation($b->Ergebnis_Heim_Spieler_FIDE_Land),
                         'name_h'    => trim($b->Ergebnis_Heim_Spieler_Nachname . ", " . $b->Ergebnis_Heim_Spieler_Vorname),
-                        'erg_h'     => $b->Ergebnis_Heim_Ergebnis,
-                        'erg_g'     => $b->Ergebnis_Gast_Ergebnis,
+                        'erg_h'     => ($b->Ergebnis_Heim_Ergebnis === "H") ? "" : $b->Ergebnis_Heim_Ergebnis,
+                        'erg_g'     => ($b->Ergebnis_Gast_Ergebnis === "H") ? "" : $b->Ergebnis_Gast_Ergebnis,
                         'name_g'    => trim($b->Ergebnis_Gast_Spieler_Nachname . ", " . $b->Ergebnis_Gast_Spieler_Vorname),
                         'country_g' => convertNation($b->Ergebnis_Gast_Spieler_FIDE_Land),
                         'titel_g'   => $b->Ergebnis_Gast_Spieler_FIDE_Titel ?? ""

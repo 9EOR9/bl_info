@@ -37,11 +37,11 @@
 <div class="video-grid">
     <div id="box-1" class="cam-box active" onclick="setActive(1, 'pi5-1')">
         <div class="label">Atrium (Pi5-1)</div>
-        <img src="http://pi5-1:8080/stream" onerror="this.src='img/cam_offline.jpg'">
+        <img src="http://192.168.0.29:8080/stream" onerror="this.src='img/cam_offline.jpg'">
     </div>
     <div id="box-2" class="cam-box" onclick="setActive(2, 'pi5-2')">
         <div class="label">5. OG (Pi5-2)</div>
-        <img src="http://pi5-2:8080/stream" onerror="this.src='img/cam_offline.jpg'">
+        <img src="http://192.168.0.18:8080/stream" onerror="this.src='img/cam_offline.jpg'">
     </div>
 </div>
 
