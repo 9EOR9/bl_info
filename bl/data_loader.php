@@ -19,7 +19,7 @@ function fetchJSON($url) {
 function convertNation($nat) {
     $nat = strtoupper(trim($nat));
     $map = [
-        'GER'=>'de','AUT'=>'at','SUI'=>'ch','FRA'=>'fr','POL'=>'pl','NED'=>'nl','SRB'=>'rs','CRO'=>'hr','HUN'=>'hu','ESP'=>'es','IRI'=>'ir','SLO'=>'si','AZE'=>'az','IND'=>'in','BUL'=>'bg','UKR'=>'ua','LAT'=>'lv','ENG' => 'gb-eng', 'AUS' => 'au', 'POR' => 'pt', 'MDA' => 'md', 'UZB'=>'uz','ISL'=>'is','BIH'=>'ba','FID'=>'fide','GRE'=>'gr','ARM'=>'am','KGZ'=>'kg', 'EGY' => "eg", "DEN" => 'dk', "TUR" => 'tr', "ROU" => 'ro', 'WLS' => 'gb-wls', "BEL" => 'be', "SWE" => 'sv'
+        'GER'=>'de','AUT'=>'at','SUI'=>'ch','FRA'=>'fr','POL'=>'pl','NED'=>'nl','SRB'=>'rs','CRO'=>'hr','HUN'=>'hu','ESP'=>'es','IRI'=>'ir','SLO'=>'si','AZE'=>'az','IND'=>'in','BUL'=>'bg','UKR'=>'ua','LAT'=>'lv','ENG' => 'gb-eng', 'AUS' => 'au', 'POR' => 'pt', 'MDA' => 'md', 'UZB'=>'uz','ISL'=>'is','BIH'=>'ba','FID'=>'fide','GRE'=>'gr','ARM'=>'am','KGZ'=>'kg', 'EGY' => "eg", "DEN" => 'dk', "TUR" => 'tr', "ROU" => 'ro', 'WLS' => 'gb-wls', "BEL" => 'be', "SWE" => 'se'
     ];
     return isset($map[$nat]) ? $map[$nat] : strtolower($nat);
 }
