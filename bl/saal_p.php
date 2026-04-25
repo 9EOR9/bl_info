@@ -28,8 +28,8 @@ if ($location == 1) {
     $url_unten  = "http://pi5-1:8080/stream";
     $check_unten = "http://pi5-1/bl/check_cam.php";
 } else {
-    $url_oben  = "http://pi-5.2:8080/stream";
-    $check_oben = "http://pi-5.2/bl/check_cam.php";
+    $url_oben  = "http://pi5-2:8080/stream";
+    $check_oben = "http://pi5-2/bl/check_cam.php";
     $url_unten  = "http://localhost:8080/stream";
     $check_unten = "check_cam.php";
 }
