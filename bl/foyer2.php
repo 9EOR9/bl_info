@@ -16,10 +16,12 @@
         <div class="glass-box">
             <div class="section-header">Casino</div>
             <div class="content-area" style="text-align: center; font-size: 2.2rem; line-height: 1.2;">
+              <div class="glass-box event-past"> <div class="section-header">Casino</div>
                 <b class="info-line">Freitag 24.04 16:30</b>
                 UKA-Cup für geladene Gäste<br><br>
                 <b class="info-line">Samstag 25.04 14:30</b>
                 Festveranstaltung 125 Jahre Berliner Schachverband
+              </div>
             </div>
         </div>
 

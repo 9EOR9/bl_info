@@ -34,6 +34,9 @@ if ($location == 1) {
     $check_unten = "check_cam.php";
 }
 
+$url_oben = "img/saal1.jpg";
+$url_unten = "img/saal1.jpg";
+
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -304,8 +307,8 @@ async function validateCams() {
 
 updateDashboard();
 setInterval(updateDashboard, 60000);
-setInterval(validateCams, 8000);
-validateCams();
+/* setInterval(validateCams, 8000);
+validateCams(); */
 </script>
 </body>
 </html>
