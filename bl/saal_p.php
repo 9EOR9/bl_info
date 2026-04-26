@@ -35,7 +35,7 @@ if ($location == 1) {
 }
 
 $url_oben = "img/saal1.jpg";
-$url_unten = "img/saal1.jpg";
+$url_unten = "img/saal2.jpg";
 
 ?>
 <!DOCTYPE html>
